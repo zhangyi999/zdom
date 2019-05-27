@@ -1,4 +1,71 @@
-// alert(`1`)
-console.log(123231)
+import dom,{
+    Commponent,
+    JoinData,
+    Observable,
+    ObjectMap,
+    getPageData
+} from './ZDom'
 
-document.getElementById('app').innerHTML = '123231'
+// 组件
+function header( ...child ) {
+    return (
+        dom.h1({class: 'z_dom_header'}, child )
+    )
+}
+const Header = Commponent(header)
+
+// 数据绑定
+function content( ) {
+    const times = this.data('time', new Date().Format('yy.MM.dd hh:mm:ss'))
+    this.loaded = () => {
+        setInterval(()=>{
+            this.data.time = new Date().Format('yy.MM.dd hh:mm:ss')
+        },1000)
+    }
+    return (
+        dom.div({class: 'z_dom_content'},
+            dom.p({},'the time now'),
+            dom.h2({}, times )
+        )
+    )
+}
+const Content = Commponent(content)
+
+// 组件套用
+function childCommponent( ) {
+    return (
+        dom.div({
+            class: JoinData( this.data.class , 'z_dom_childcommponent')
+        },
+            dom.p({},'this is childCommponent')
+        )
+    )
+}
+const ChildCommponent = Commponent(childCommponent)
+
+function prantCommponent( ...child ) {
+    return (
+        dom.div({
+            class : JoinData( this.data.class , 'z_dom_prantcommponent')
+        },
+            dom.p({},'this is PrantCommponent'),
+            ChildCommponent({
+                class: JoinData( this.data.class , 'z_dom_prantcommponent')
+            }),
+            child
+        )
+    )
+}
+const PrantCommponent = Commponent(prantCommponent)
+
+function Index() {
+    return (
+        dom.div({class:'z_dom_index'},
+            Header({},'hello word!'),
+            Content({}),
+            PrantCommponent({ class: 'pantent' })
+        )
+    )
+}
+
+document.getElementById('app').appendChild(Index())
