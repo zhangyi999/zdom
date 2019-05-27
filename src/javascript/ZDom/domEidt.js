@@ -71,11 +71,8 @@ function addChild ( prant, childs ) {
         prant.appendChild(document.createTextNode(childs));
     } else if ( childs.value !== undefined ) {
         let oldValue = childs.props.data[childs.key];
-        let supplementStr = ''
         if ( typeof oldValue === 'string' || typeof oldValue === 'number' ) {
-            supplementStr = childs.supplementStr;
-            childs.supplementStr = '';
-            oldValue = childs.supplement( oldValue, supplementStr );
+            oldValue = childs.supplement( oldValue );
         }
         let oldEL = initChild( oldValue );
         let oldRepalce = oldValue instanceof Array ? Array.from( oldEL.childNodes ) : oldEL ;
@@ -85,7 +82,7 @@ function addChild ( prant, childs ) {
                 const {data, type, index} = newVal;
                 oldRepalce = ArrayElement[type]( prant, oldRepalce, data, index );
             } else {
-                if ( typeof newVal === 'string' || typeof newVal === 'number' ) newVal = childs.supplement( newVal, supplementStr );
+                if ( typeof newVal === 'string' || typeof newVal === 'number' ) newVal = childs.supplement( newVal );
                 // console.log( newVal )
                 oldRepalce = replaceDom( prant, oldRepalce , newVal );
             }
@@ -175,13 +172,24 @@ function creatElement(type ,arr, ...childs) {
         }
         if ( typeof value === 'string' || typeof value === 'number' ) {
             return setAttribute(dom, key, value )
-        } else if (value.domtree !== undefined ) {
-            const supplementStr = value.supplementStr;
-            value.supplementStr = '';
+        }
+        
+        if (value.domtree !== undefined ) {
             value.attrtree.push( function ( newVal ) {
-                setAttribute(dom, key, value.supplement( newVal, supplementStr ) )
+                setAttribute(dom, key, value.supplement( newVal ) )
             })
-            return setAttribute(dom, key, value.supplement( value.value, supplementStr ) )
+            return setAttribute(dom, key, value.supplement( value.value ) )
+        }
+
+        if ( value instanceof Array ) {
+            value.map( v => {
+               if ( v.domtree !== undefined ) {
+                    v.attrtree.push( function ( newVal ) {
+                        setAttribute(dom, key, v.supplement( newVal, value ) )
+                    })
+                    return setAttribute(dom, key, v.supplement( v.value, value ) )
+                }
+            })
         }
     })
     addChild(dom, ...childs)

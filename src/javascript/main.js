@@ -35,7 +35,7 @@ const Content = Commponent(content)
 function childCommponent( ) {
     return (
         dom.div({
-            class: JoinData( this.data.class , 'z_dom_childcommponent')
+            class: JoinData( this.data.class , ' <l')
         },
             dom.p({},'this is childCommponent')
         )
@@ -46,11 +46,11 @@ const ChildCommponent = Commponent(childCommponent)
 function prantCommponent( ...child ) {
     return (
         dom.div({
-            class : JoinData( this.data.class , 'z_dom_prantcommponent')
+            class : JoinData( this.data.class , ' z_dom_prantcommponent ')
         },
             dom.p({},'this is PrantCommponent'),
             ChildCommponent({
-                class: JoinData( this.data.class , 'z_dom_prantcommponent')
+                class: JoinData( this.data.class , ' <z')
             }),
             child
         )
@@ -58,14 +58,25 @@ function prantCommponent( ...child ) {
 }
 const PrantCommponent = Commponent(prantCommponent)
 
+const statics = Observable();
+var a = '111'
+const ks = {
+    get: () => {
+     return a
+    }
+}
 function Index() {
     return (
         dom.div({class:'z_dom_index'},
             Header({},'hello word!'),
             Content({}),
-            PrantCommponent({ class: 'pantent' })
+            PrantCommponent({ class: JoinData(statics.data('pantent','a'), ks )})
         )
     )
 }
+setTimeout(()=>{
+    a  = '22222'
+    statics.data.pantent = 'b'
+},5000)
 
 document.getElementById('app').appendChild(Index())

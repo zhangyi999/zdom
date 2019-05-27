@@ -20,8 +20,8 @@ function JoinData( ) {
     let i = 0, len = arg.length;
     const supplementArr = []
     while ( i < len ) {
-        i++;
         const argValue = arg[i];
+        i++;
         if ( argValue instanceof Array ) {
             supplementArr.push(...argValue);
             continue;

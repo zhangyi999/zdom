@@ -151,8 +151,15 @@ function Props( attr ) {
             domtree: props.domtree[key],
             attrtree: props.attrtree[key],
             props,
-            supplement: (newVal, suppleSre) => replaceStr( newVal || props.data[key], suppleSre || data.supplementStr ),
-            supplementStr: '',
+            supplement: (newVal, supple) => {
+                if ( supple === undefined ) return newVal
+                let supplement = ''
+                supple.map( v => {
+                    if ( typeof v === 'string' ) supplement += v;
+                    else if ( v.get !== undefined ) supplement += v.get()
+                })
+                return supplement
+            },
             watch : callback => props.watch[key].push(callback.bind(props)),
             joinStr: str => {
                 if ( data.supplementStr.match(/{\S*?}/g) !== null ) {
