@@ -28,7 +28,6 @@ function JoinData( ) {
         }
         supplementArr.push(argValue);
     }
-    
     return supplementArr
 }
 
