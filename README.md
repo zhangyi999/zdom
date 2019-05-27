@@ -1,6 +1,6 @@
 # zdom
 
-## 一个简单的前端库，用于学习 javascript
+一个简单的前端库，用于学习 javascript
 
 ### run
 
