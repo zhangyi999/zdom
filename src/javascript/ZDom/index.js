@@ -15,16 +15,21 @@ function getPageData() {
     return data
 }
 
-function JoinData( data, str ) {
-    if ( data === undefined ) return str;
-    str = str.match(/{\S*?}/g) === null ? '{v} '+str:str;
-    if ( typeof data === 'string' || typeof data === 'number' ) { 
-        return replaceStr( data , str );
+function JoinData( ) {
+    const arg = [...arguments];
+    let i = 0, len = arg.length;
+    const supplementArr = []
+    while ( i < len ) {
+        i++;
+        const argValue = arg[i];
+        if ( argValue instanceof Array ) {
+            supplementArr.push(...argValue);
+            continue;
+        }
+        supplementArr.push(argValue);
     }
-    if ( data.joinStr ) {
-        data.joinStr(str);
-        return data;
-    }
+    
+    return supplementArr
 }
 
 export default dom
