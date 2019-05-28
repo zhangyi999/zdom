@@ -5,10 +5,11 @@ const exec = util.promisify(require('child_process').exec);
 
 const local_path = __dirname + '/build/'
 const service_path = '/***/test/'//app/html/pay
-const _http = '127.0.0.1'
+const _http = '0.0.0.0'
 const ARCHIVE_NAME = 'build'
 const USER = 'admin'
 const PASSWORD = 'admin'
+
 const client = new Client({
     port: '22',
     host: _http,
