@@ -7,5 +7,5 @@
 ```
 > git clone https://github.com/zhangyi999/zdom.git
 > npm i
-> npm run dev
+> npm start
 ```

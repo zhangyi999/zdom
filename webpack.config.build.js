@@ -32,7 +32,8 @@ module.exports = {
                         presets: [ "es2015"],
                         "plugins": [
                             'transform-runtime',
-                            "transform-async-to-generator"
+                            "transform-async-to-generator",
+                            'transform-decorators-legacy'
                         ],
                         babelrc: false
                     } 
@@ -80,7 +81,7 @@ module.exports = {
         }),
         new uglifyjs(),//压缩
         new ExtractTextWebapckPlugin({
-            filename: '[name]-bundle.css'
+            filename: '[name].css'
         }),
         new CopyWebpackPlugin([{
             from: './src/static',
@@ -93,7 +94,8 @@ module.exports = {
                 verbose:  true,        　　　　　　　　　　//开启在控制台输出信息
                 dry:      false        　　　　　　　　　　//启用删除文件
             }
-        )
+        ),
+        
     ], 
     devtool:  'cheap-module-source-map',//'eval-source-map',//
     devServer: { 

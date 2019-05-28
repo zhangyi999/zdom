@@ -11,9 +11,25 @@
     <meta name=theme-color content=#2196f3>
     <!-- Your app title -->
     <title>NaturePay</title>
-  </head>
+  <link href=index.css?c04be7a456d7fd240f6e rel=stylesheet></head>
   <body>
     <div id=app></div>
-    <script type=text/javascript src=./static/index.js></script>
-  <script type=text/javascript src=index.js?b3e81ef191e93b690c63></script></body>
+    <script>
+      Date.prototype.Format = function (fmt) { //author: meizz 
+          var o = {
+              "M+": this.getMonth() + 1, //月份 
+              "d+": this.getDate(), //日 
+              "h+": this.getHours(), //小时 
+              "m+": this.getMinutes(), //分 
+              "s+": this.getSeconds(), //秒 
+              "q+": Math.floor((this.getMonth() + 3) / 3), //季度 
+              "S": this.getMilliseconds() //毫秒 
+          };
+          if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+          for (var k in o)
+          if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+          return fmt;
+      }
+    </script>
+  <script type=text/javascript src=index.js?c04be7a456d7fd240f6e></script></body>
 </html>

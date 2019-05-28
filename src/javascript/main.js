@@ -6,6 +6,8 @@ import dom,{
     getPageData
 } from './ZDom'
 
+import './init.css'
+
 // 组件
 function header( ...child ) {
     return (
@@ -66,14 +68,25 @@ const ks = {
     }
 }
 function Index() {
+    const img = statics.data('img','a')
     return (
         dom.div({class:'z_dom_index'},
-            Header({},'hello word!'),
+            // Header({},'hello word!'),
             Content({}),
-            PrantCommponent({ class: JoinData(statics.data('pantent','a'), ks )})
+            PrantCommponent({ class: JoinData(statics.data('pantent','a'), ks )}),
+            dom.img({src: JoinData( './static/img/',img,'.jpg' ) }),
+            dom.a({
+                '@click': change
+            },'修改 class')
         )
     )
 }
+
+function change() {
+    statics.data.img = 'g'
+    console.log(statics.data.pantent)
+}
+
 setTimeout(()=>{
     a  = '22222'
     statics.data.pantent = 'b'

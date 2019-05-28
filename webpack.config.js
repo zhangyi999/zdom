@@ -2,7 +2,7 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin') // 生成html的插件
 // const ExtractTextWebapckPlugin = require('extract-text-webpack-plugin') //CSS文件单独提取出来 
 const ExtractTextWebapckPlugin = require('mini-css-extract-plugin')
-
+const webpack = require('webpack');
 const  index = 'src'
 
 module.exports = { 
@@ -24,7 +24,8 @@ module.exports = {
                         presets: [ "es2015"],
                         "plugins": [
                             'transform-runtime',
-                            "transform-async-to-generator"
+                            "transform-async-to-generator",
+                            'transform-decorators-legacy'
                         ],
                         babelrc: false
                     } 
@@ -40,7 +41,8 @@ module.exports = {
                             minize: true
                         }
                     },
-                    "css-loader"
+                    "css-loader",
+                    // "css-hot-loader"
                 ]
             },
             { 
@@ -71,8 +73,10 @@ module.exports = {
             } 
         }), 
         new ExtractTextWebapckPlugin({
-            filename: '[name]-bundle.css'
-        })
+            filename: '[name].css'
+        }),
+        new webpack.HotModuleReplacementPlugin(),
+        new webpack.NamedModulesPlugin(),
     ], 
     devtool:  'eval-source-map',//'cheap-module-source-map',//
     devServer: { 
@@ -82,6 +86,7 @@ module.exports = {
         overlay: true, 
         compress: false, // 服务器返回浏览器的时候是否启动gzip压缩 
         historyApiFallback: true,
+        // hotOnly:true
         // proxy: {
         //     '/group1/*': {
         //         target: 'http://39.98.207.74:8050',//http://39.98.207.74:8050/group1/M00/00/00/rBpYRlyFu3-AeVw3AAHfICE0VEc114.jpg
