@@ -1,6 +1,6 @@
 import dom from './domEidt'
 
-import Commponent, {replaceStr, Observable} from './commponent'
+import Commponent, { Observable } from './commponent'
 
 import {ObjectMap} from './public'
 
@@ -22,6 +22,7 @@ function JoinData( ) {
     while ( i < len ) {
         const argValue = arg[i];
         i++;
+        if ( argValue === undefined ) continue;
         if ( argValue instanceof Array ) {
             supplementArr.push(...argValue);
             continue;

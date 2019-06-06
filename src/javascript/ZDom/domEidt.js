@@ -5,7 +5,8 @@ import {ObjectMap} from './public'
 function setAttribute(dom, key, attrs) {
     if(key === 'placeholder') return dom.placeholder = attrs || '';
     if(key === 'value') return dom.value = attrs || ''
-    if(key === 'checked') dom.checked = attrs || false
+    if(key === 'checked') return dom.checked = attrs || false
+    if(key === 'disabled') return dom.disabled = attrs || false
     dom.setAttribute(key, attrs);
 }
 
@@ -58,8 +59,26 @@ const ArrayElement = {
 }
 
 function addChild ( prant, childs ) {
-    // if ( childs === undefined ) return ''
-    if ( childs instanceof Array ) {
+    if ( childs === undefined ) return ''
+    if ( childs.Observable !== undefined ) {
+        childs = childs.Observable;
+        let oldValue = childs.props.data[childs.key];
+        oldValue = childs.supplement( oldValue );
+        let oldEL = initChild( oldValue );
+        let oldRepalce = oldValue instanceof Array ? Array.from( oldEL.childNodes ) : oldEL ;
+        childs.domtree.push( function ( newVal ) {
+            if ( newVal.type !== undefined ) {
+                const {data, type, index} = newVal;
+                // console.log( ,'dataa')
+                oldRepalce = ArrayElement[type]( prant, oldRepalce, data, index );
+            } else {
+                if ( typeof newVal === 'string' || typeof newVal === 'number' ) newVal = childs.supplement( newVal );
+                // console.log( newVal )
+                oldRepalce = replaceDom( prant, oldRepalce , newVal );
+            }
+        });
+        addChild( prant, oldEL );
+    } else if ( childs instanceof Array ) {
         const len =  childs.length;
         for( let i = 0; i < len; i ++) {
             const child = childs[i];
@@ -69,26 +88,7 @@ function addChild ( prant, childs ) {
         prant.appendChild(childs)
     } else if ( typeof childs === 'string' || typeof childs === 'number' ) {
         prant.appendChild(document.createTextNode(childs));
-    } else if ( childs.value !== undefined ) {
-        let oldValue = childs.props.data[childs.key];
-        if ( typeof oldValue === 'string' || typeof oldValue === 'number' ) {
-            oldValue = childs.supplement( oldValue );
-        }
-        let oldEL = initChild( oldValue );
-        let oldRepalce = oldValue instanceof Array ? Array.from( oldEL.childNodes ) : oldEL ;
-        
-        childs.domtree.push( function ( newVal ) {
-            if ( newVal.type !== undefined ) {
-                const {data, type, index} = newVal;
-                oldRepalce = ArrayElement[type]( prant, oldRepalce, data, index );
-            } else {
-                if ( typeof newVal === 'string' || typeof newVal === 'number' ) newVal = childs.supplement( newVal );
-                // console.log( newVal )
-                oldRepalce = replaceDom( prant, oldRepalce , newVal );
-            }
-        });
-        addChild( prant, oldEL );
-    } else {
+    } else  {
         console.log(childs);
         console.log('child 类型不支持');
     }
@@ -96,8 +96,8 @@ function addChild ( prant, childs ) {
 
 function initChild( childs ) {
     if ( childs instanceof Element || childs instanceof Text ) return childs;
-    else if ( typeof childs === 'string' || typeof childs === 'number' ) return document.createTextNode(childs);
     else if ( childs instanceof Array ) return randerArray(childs);
+    else return document.createTextNode(childs);
 }
 
 
@@ -106,7 +106,7 @@ function randerArray(arr) {
     if(arr instanceof Array) {
         const div = document.createDocumentFragment()
         arr.map( v => {
-            const dom = initChild(v)
+            const dom = initChild(arr.mapCall ? arr.mapCall(v) : v)
             div.appendChild(dom)
         })
         return div
@@ -143,6 +143,8 @@ function replaceDom( dom , oldDom, newDom ) {
     return oldRepalce;
 }
 
+
+
 function creatElement(type ,arr, ...childs) {
     const dom = document.createElement(type);
     ObjectMap(arr, ( value, key ) => {
@@ -155,6 +157,11 @@ function creatElement(type ,arr, ...childs) {
             dom.innerHTML = value
             return;
         }
+
+        if ( typeof value === 'string' || typeof value === 'number' ) {
+            return setAttribute(dom, key, value )
+        }
+
         if(/@\S/.test(key)) {
             const events = key.replace('@','')
             if(!events || events === '' || value === '') return;
@@ -170,26 +177,30 @@ function creatElement(type ,arr, ...childs) {
             })
             return;
         }
-        if ( typeof value === 'string' || typeof value === 'number' ) {
-            return setAttribute(dom, key, value )
-        }
         
-        if (value.domtree !== undefined ) {
+        if ( value.Observable !== undefined ) {
+            value = value.Observable;
             value.attrtree.push( function ( newVal ) {
                 setAttribute(dom, key, value.supplement( newVal ) )
             })
-            return setAttribute(dom, key, value.supplement( value.value ) )
+            return setAttribute(dom, key, value.supplement( value.value ) );
         }
 
         if ( value instanceof Array ) {
+            let strStatus = true, str = ''
             value.map( v => {
-               if ( v.domtree !== undefined ) {
+                if ( typeof v === 'string' || typeof v === 'number' ) return str += v
+                if ( v.Observable !== undefined ) {
+                    v = v.Observable
+                    strStatus = false
                     v.attrtree.push( function ( newVal ) {
                         setAttribute(dom, key, v.supplement( newVal, value ) )
                     })
+                    
                     return setAttribute(dom, key, v.supplement( v.value, value ) )
                 }
             })
+            strStatus? setAttribute(dom, key, str ):''
         }
     })
     addChild(dom, ...childs)

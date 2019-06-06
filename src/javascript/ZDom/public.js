@@ -1,4 +1,5 @@
 export function ObjectMap(obj, call) {
+    if ( obj === undefined ) return 
     const res = {}
     const keys = Object.keys(obj)
     const len = keys.length

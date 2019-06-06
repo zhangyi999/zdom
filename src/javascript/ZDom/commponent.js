@@ -1,4 +1,4 @@
-import Observable, {replaceStr} from './observable'
+import Observable from './observable'
 
 function Commponent( ZDomCommponFunction ) {
     return function ( attr, ...chlid ) {
@@ -13,6 +13,5 @@ function Commponent( ZDomCommponFunction ) {
 export default Commponent 
 
 export {
-    replaceStr ,
     Observable
 }

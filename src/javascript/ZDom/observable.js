@@ -1,5 +1,18 @@
 import {ObjectMap} from './public'
 
+Array.prototype.mapA = function(fn) {
+    let i = 0
+	const arr = []
+    const len = this.length
+    addPorto(arr, 'mapCall', fn)
+	while( i < len ) {
+		arr.push(this[i])
+		i ++
+    }
+	return arr
+	
+}
+
 function addPorto(obj, key, val) {
     Object.defineProperty(obj, key, {
         enumerable: false,
@@ -9,15 +22,9 @@ function addPorto(obj, key, val) {
     })
 }
 
-function replaceStr( val, str ) {
-    if ( str === '' ) return val;
-    if ( typeof val === 'string' || typeof val === 'number' ) return str.replace( '{v}', val );
-    return val;
-}
-
 function ZdomArray ( arr , callback) {
     if ( !(arr instanceof Array ) ) return arr;
-
+    if ( arr.length === 0 ) arr = ['']
     // const domtree = arr.map( v => [] );
     // const attrtree = arr.map( v => [] );
     // function get ( index ) {
@@ -41,7 +48,9 @@ function ZdomArray ( arr , callback) {
     // }
 
     function add ( newArray ) {
+        if ( ! (newArray instanceof Array ) ) newArray = [newArray];
         this.push(...newArray)
+        newArray.mapCall?'':addPorto(newArray, 'mapCall', this.mapCall)
         callback({
             type: 'push',
             data: newArray
@@ -51,8 +60,7 @@ function ZdomArray ( arr , callback) {
     function replace (index, newValue) {
         if ( ! (newValue instanceof Array ) ) newValue = [newValue];
         this.splice( index, newValue.length, ...newValue );
-        domtree[index].map( v => v(...newValue));
-        attrtree[index].map( v => v(...newValue));
+        newValue.mapCall?'':addPorto(newValue, 'mapCall', this.mapCall)
         callback({
             type: 'replace',
             index, 
@@ -61,7 +69,10 @@ function ZdomArray ( arr , callback) {
     }
 
     function addProve ( newValue ) {
+        if ( ! (newValue instanceof Array ) ) newValue = [newValue];
         this.unshift( ...newValue );
+        // console.log(newValue, newValue.mapCall)
+        newValue.mapCall?'':addPorto(newValue, 'mapCall', this.mapCall)
         callback({
             type: 'unshift',
             data: newValue
@@ -86,28 +97,44 @@ function ZdomArray ( arr , callback) {
     return arr
 }
 
+const TypeFun = {
+    string: e => new String(e),
+    number: e => new Number(e),
+    boolean: e => new Boolean(e)
+}
+
+function addObservable( s, Observable ) {
+    // console.log(typeof s, Observable.key, Observable)
+    if ( s === undefined ) throw ' undefined is not Object '
+    if ( s.Observable !== undefined ) return s
+    const val = TypeFun[typeof s]? 
+        TypeFun[typeof s](s): 
+        s instanceof Array?
+            ZdomArray( Observable.value, newData => Observable.domtree.map( v => v(newData))):
+            s;
+
+    addPorto(val, 'Observable', Observable);
+    return val
+}
+
 function Observable( obj, key, val ) {
-    let oldVal = ZdomArray(val, newData => obj.domtree[key].map( v => v(newData)));
+    let oldValueData = val.value
+    let oldVal = addObservable( oldValueData, val );
     Object.defineProperty(obj.data, key, {
         enumerable: true, // 可枚举
         configurable: true, // fales 不能再define
         get() {
             return oldVal
-        },
+        }, 
         set(newVal) {
-            if (newVal == oldVal && oldVal !== '') {
+            if (newVal == oldValueData && oldValueData !== '') {
                 return;
             }
-            oldVal = ZdomArray(newVal, newData => obj.domtree[key].map( v => v(newData)));
-            // oldVal = newVal;
-            // if ( !(newVal instanceof Array ) && supplement ) oldVal = replaceStr( newVal, supplement );
-            obj.domtree[key].map( v => v(oldVal) );
-            obj.attrtree[key].map( v => v(oldVal) );
-            obj.componentUpdate ? obj.componentUpdate() : '' ;
-            obj.watch[key].map( v => v(oldVal) );
+            oldVal = addObservable( newVal, val );
+            oldValueData = newVal;
+            val.change( oldVal )
         }
     });
-    // console.log(obv,'Observable')
     return obj
 } 
 
@@ -125,73 +152,49 @@ function Props( attr ) {
             });
             return data;
         }
-        if ( typeof value === 'object' && value.domtree !== undefined ) {
-            Object.defineProperty(props.data, key, {
-                enumerable: true,
-                configurable: true,
-                get() {
-                    return value.get()
-                },
-                set( n ) {
-                    value.set = n
-                }
-            })
+        if ( value.Observable !== undefined ) {
+            Observable( props, key, value.Observable )
             return value;
         };
-        value = value || props.data[key] || '';
-        // console.log(key, props.data[key], props.data[key]?'1':'0', value,'valuevalue')
-        Observable( props, key, value );
+        
+        value = value === false? value : value || props.data[key] || '';
         props.domtree[key]?'':props.domtree[key] = [];
         props.attrtree[key]?'':props.attrtree[key] = [];
         props.watch[key]?'': props.watch[key] = [];
-        // let supplement = ''; 
         const data =  {
             value,
             key,
             domtree: props.domtree[key],
             attrtree: props.attrtree[key],
+            change ( newValue ) {
+                props.domtree[key].map( v => v(newValue) );
+                props.attrtree[key].map( v => v(newValue) );
+                props.componentUpdate ? props.componentUpdate( key ) : '' ;
+                props.watch[key].map( v => v(newValue) );
+            },
             props,
             supplement: (newVal, supple) => {
                 if ( supple === undefined ) return newVal
                 let supplement = ''
                 supple.map( v => {
-                    if ( typeof v === 'string' ) supplement += v;
-                    else if ( v.get !== undefined ) supplement += v.get()
+                    supplement += v.Observable?v.Observable.get():v
                 })
                 return supplement
             },
             watch : callback => props.watch[key].push(callback.bind(props)),
-            joinStr: str => {
-                if ( data.supplementStr.match(/{\S*?}/g) !== null ) {
-                    data.supplementStr = replaceStr( data.supplementStr, str );
-                } else {
-                    data.supplementStr = str;
-                }
+            set( n ) {
+                props.data[key] = n
+                return n
             },
-            get: () => props.data[key],
-            map: fun => {
-                const value = props.data[key];
-                if ( !( value instanceof Array ) ) throw key + 'no Array';
-                return value.map(fun);
+            get() {
+                return props.data[key] 
             }
         }
-        Object.defineProperty( data, 'set', {
-            enumerable: true, // 可枚举
-            configurable: false, // false 不能再define
-            get() {
-                return props.data[key]
-            },
-            set( n ) {
-                props.data[key] = n;
-            }
-        });
-
-        return data; 
+        Observable( props, key, data );
+        return props.data[key]; 
     }
     props.data = Object.assign( initData, attr );
     return props
 }
 
 export default Props
-
-export {replaceStr}
