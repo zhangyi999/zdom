@@ -5,8 +5,8 @@ import {ObjectMap} from './public'
 function setAttribute(dom, key, attrs) {
     if(key === 'placeholder') return dom.placeholder = attrs || '';
     if(key === 'value') return dom.value = attrs || ''
-    if(key === 'checked') return dom.checked = attrs || false
-    if(key === 'disabled') return dom.disabled = attrs || false
+    if(key === 'checked') return dom.checked = attrs == true || false
+    if(key === 'disabled') return dom.disabled = attrs == true || false
     dom.setAttribute(key, attrs);
 }
 
