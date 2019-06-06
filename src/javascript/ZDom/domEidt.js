@@ -77,7 +77,11 @@ function addChild ( prant, childs ) {
                 oldRepalce = replaceDom( prant, oldRepalce , newVal );
             }
         });
-        addChild( prant, oldEL );
+        if ( oldEL instanceof Array ) {
+            addChild( prant, oldEL );
+        } else {
+            prant.appendChild(oldEL)
+        }
     } else if ( childs instanceof Array ) {
         const len =  childs.length;
         for( let i = 0; i < len; i ++) {
