@@ -1,14 +1,9 @@
 import {ObjectMap} from './public'
 
 Array.prototype.mapA = function(fn) {
-    if ( this.Observable ) {
-        this.mapCall = fn
-        return this
-    } else {
-        const arr = [...this]
-        addPorto(arr, 'mapCall', fn)
-        return arr
-    }
+    const arr = this.Observable?this:[...this]
+    addPorto(arr, 'mapCall', fn)
+    return arr
 }
 
 function addPorto(obj, key, val) {
@@ -23,28 +18,6 @@ function addPorto(obj, key, val) {
 function ZdomArray ( arr , callback) {
     if ( !(arr instanceof Array ) ) return arr;
     if ( arr.length === 0 ) arr = ['']
-    // const domtree = arr.map( v => [] );
-    // const attrtree = arr.map( v => [] );
-    // function get ( index ) {
-    //     return {
-    //         value: arr[index],
-    //         index,
-    //         domtree,
-    //         attrtree
-    //     }
-    // }
-    // addPorto(arr, 'get', get);
-    // let mapFun;
-
-    // function maps ( call ) {
-    //     mapFun = call;
-    //     callback({
-    //         type: 'push',
-    //         data: newArray,
-    //         mapFun
-    //     })
-    // }
-
     function add ( newArray ) {
         if ( ! (newArray instanceof Array ) ) newArray = [newArray];
         this.push(...newArray)
