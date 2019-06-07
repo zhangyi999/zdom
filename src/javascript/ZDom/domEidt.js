@@ -3,7 +3,6 @@ import DomPrototype from './dom'
 import {ObjectMap} from './public'
 
 function setAttribute(dom, key, attrs) {
-    key === 'checked'? console.log(key, attrs, attrs == true, '-------'):''
     if(key === 'placeholder') return dom.placeholder = attrs || '';
     if(key === 'value') return dom.value = attrs || ''
     if(key === 'checked') return dom.checked = attrs == true
