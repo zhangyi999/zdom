@@ -1,16 +1,14 @@
 import {ObjectMap} from './public'
 
 Array.prototype.mapA = function(fn) {
-    let i = 0
-	const arr = []
-    const len = this.length
-    addPorto(arr, 'mapCall', fn)
-	while( i < len ) {
-		arr.push(this[i])
-		i ++
+    if ( this.Observable ) {
+        this.mapCall = fn
+        return this
+    } else {
+        const arr = [...this]
+        addPorto(arr, 'mapCall', fn)
+        return arr
     }
-	return arr
-	
 }
 
 function addPorto(obj, key, val) {
