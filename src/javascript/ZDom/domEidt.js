@@ -3,10 +3,11 @@ import DomPrototype from './dom'
 import {ObjectMap} from './public'
 
 function setAttribute(dom, key, attrs) {
+    key === 'checked'? console.log(key, attrs, attrs == true, '-------'):''
     if(key === 'placeholder') return dom.placeholder = attrs || '';
     if(key === 'value') return dom.value = attrs || ''
-    if(key === 'checked') return dom.checked = attrs == true || false
-    if(key === 'disabled') return dom.disabled = attrs == true || false
+    if(key === 'checked') return dom.checked = attrs == true
+    if(key === 'disabled') return dom.disabled = attrs == true
     dom.setAttribute(key, attrs);
 }
 
@@ -163,10 +164,6 @@ function creatElement(type ,arr, ...childs) {
             return;
         }
 
-        if ( typeof value === 'string' || typeof value === 'number' ) {
-            return setAttribute(dom, key, value )
-        }
-
         if(/@\S/.test(key)) {
             const events = key.replace('@','')
             if(!events || events === '' || value === '') return;
@@ -182,7 +179,7 @@ function creatElement(type ,arr, ...childs) {
             })
             return;
         }
-        
+
         if ( value.Observable !== undefined ) {
             value = value.Observable;
             value.attrtree.push( function ( newVal ) {
@@ -206,7 +203,9 @@ function creatElement(type ,arr, ...childs) {
                 }
             })
             strStatus? setAttribute(dom, key, str ):''
+            return
         }
+        setAttribute(dom, key, value )
     })
     addChild(dom, ...childs)
     return dom
