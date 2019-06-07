@@ -110,7 +110,7 @@ function addObservable( s, Observable ) {
     const val = TypeFun[typeof s]? 
         TypeFun[typeof s](s): 
         s instanceof Array?
-            ZdomArray( Observable.value, newData => Observable.domtree.map( v => v(newData))):
+            ZdomArray( s, newData => Observable.domtree.map( v => v(newData))):
             s;
 
     addPorto(val, 'Observable', Observable);
