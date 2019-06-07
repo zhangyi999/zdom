@@ -84,9 +84,10 @@ function addChild ( prant, childs ) {
         }
     } else if ( childs instanceof Array ) {
         const len =  childs.length;
+        const mapCall  = childs.mapCall
         for( let i = 0; i < len; i ++) {
             const child = childs[i];
-            addChild( prant, child );
+            addChild( prant, mapCall?mapCall(child,i): child);
         }
     } else if ( childs instanceof Element || childs instanceof Text || childs instanceof DocumentFragment ) {
         prant.appendChild(childs)
