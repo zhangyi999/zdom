@@ -109,6 +109,22 @@ function Observable( obj, key, val ) {
     return obj
 } 
 
+/** 
+ * Data() 的作用是创建钩子
+ * 钩子数据结构
+ * data = {
+ *  key,
+ *  initValue,
+ *  props,
+ *  domtree,
+ *  attrtree,
+ *  change,
+ *  watch,
+ *  get
+ * }
+ * 
+ *  */
+
 function Props( attr ) {
     const props = {
         domtree: {},
@@ -144,14 +160,6 @@ function Props( attr ) {
                 props.watch[key].map( v => v(newValue) );
             },
             props,
-            supplement: (newVal, supple) => {
-                if ( supple === undefined ) return newVal
-                let supplement = ''
-                supple.map( v => {
-                    supplement += v.Observable?v.Observable.get():v
-                })
-                return supplement
-            },
             watch : callback => props.watch[key].push(callback.bind(props)),
             set( n ) {
                 props.data[key] = n
