@@ -1,8 +1,15 @@
 import {ObjectMap} from './public'
+import checkTypes from './types'
+
+// Array.prototype.mapA = function(fn) {
+//     const arr = this.Observable?this:[...this]
+//     addPorto(arr, 'mapCall', [])
+//     return arr
+// }
 
 Array.prototype.mapA = function(fn) {
     const arr = this.Observable?this:[...this]
-    addPorto(arr, 'mapCall', fn)
+    arr.mapCall?arr.mapCall.push(fn):addPorto(arr, 'mapCall', [fn])
     return arr
 }
 
@@ -88,6 +95,34 @@ function addObservable( s, Observable ) {
     return val
 }
 
+// return ture is diff
+function undiff( oldData, newData ) {
+    if ( oldData == newData ) return true
+    let diff = true
+    if ( checkTypes(oldData) === 'Array' &&  checkTypes(newData) === 'Array' ) {
+        const olen = oldData.length
+        const nlen = newData.length
+        if ( olen != nlen ) return false
+        for ( let i = 0; i < olen; i++ ) {
+            if ( undiff( oldData[i], newData[i] ) === false ) {
+                diff = false
+                break; 
+            }
+        }
+        return diff
+    }
+
+    if ( checkTypes(oldData) === 'Objcet' &&  checkTypes(newData) === 'Objcet' ) { 
+        for ( i in  oldData ) {
+            if ( undiff( oldData[i], newData[i] ) === false ) {
+                diff = false
+                break; 
+            }
+        }
+        return diff
+    }
+}
+
 function Observable( obj, key, val ) {
     let oldValueData = val.value
     let oldVal = addObservable( oldValueData, val );
@@ -98,9 +133,7 @@ function Observable( obj, key, val ) {
             return oldVal
         }, 
         set(newVal) {
-            if (newVal == oldValueData && oldValueData !== '') {
-                return;
-            }
+            if ( undiff( newVal, oldValueData ) ) return
             oldVal = addObservable( newVal, val );
             oldValueData = newVal;
             val.change( oldVal )

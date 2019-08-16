@@ -35,3 +35,5 @@ const a = [ v => 2*v , v => v+10, v => v*v ]
     console.log(b)
     console.timeEnd('11')
 }();
+
+[1,[2,[4],4,[5,5,[44,[2,[4]]]]]].flat(Infinity); 

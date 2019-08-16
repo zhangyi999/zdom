@@ -65,6 +65,8 @@ function addChild ( prant, childs ) {
         childs = childs.Observable;
         let oldValue = childs.props.data[childs.key];
         // oldValue = supplementArray( oldValue );
+        // console.log(,'oldValue')
+        const thisDomeMapCall = oldValue.mapCall
         let oldEL = initChild( oldValue );
         let oldRepalce = oldValue instanceof Array ? Array.from( oldEL.childNodes ) : oldEL ;
         childs.domtree.push( function ( newVal ) {
@@ -74,7 +76,14 @@ function addChild ( prant, childs ) {
                 oldRepalce = ArrayElement[type]( prant, oldRepalce, data, index );
             } else {
                 // if ( typeof newVal === 'string' || typeof newVal === 'number' ) newVal = supplementArray( newVal );
-                // console.log( newVal )
+                if ( newVal instanceof Array ) {
+                    Object.defineProperty(newVal, 'mapCall', {
+                        enumerable: false,
+                        configurable: false,
+                        writable: false,
+                        value: thisDomeMapCall
+                    })
+                }
                 oldRepalce = replaceDom( prant, oldRepalce , newVal );
             }
         });
@@ -85,10 +94,9 @@ function addChild ( prant, childs ) {
         }
     } else if ( childs instanceof Array ) {
         const len =  childs.length;
-        const mapCall  = childs.mapCall
         for( let i = 0; i < len; i ++) {
             const child = childs[i];
-            addChild( prant, mapCall?mapCall(child,i): child);
+            addChild( prant, child );
         }
     } else if ( childs instanceof Element || childs instanceof Text || childs instanceof DocumentFragment ) {
         prant.appendChild(childs)
@@ -111,10 +119,22 @@ function initChild( childs ) {
 function randerArray(arr) {
     if(arr instanceof Array) {
         const div = document.createDocumentFragment()
-        arr.map( v => {
-            const dom = initChild(arr.mapCall ? arr.mapCall(v) : v)
-            div.appendChild(dom)
-        })
+        const mapCall = arr.mapCall
+        if ( mapCall !== undefined ) {
+            arr.map( v => {
+                let v1 = v;
+                mapCall.map( fn => {
+                    v1 = fn(v1)
+                })
+                const dom = initChild( v1 )
+                div.appendChild(dom)
+            })
+        } else {
+            arr.map( v => {
+                const dom = initChild( v )
+                div.appendChild(dom)
+            })
+        }
         return div
     } else {
         throw 'randerArray 仅处理数组'
@@ -195,9 +215,9 @@ function mapAttr( dom, arr ) {
             value.map( v => {
                 if ( v.Observable !== undefined ) {
                     v = v.Observable
-                    console.log(value,'123123')
+                    // console.log(value,'123123')
                     v.attrtree.push( function ( ) {
-                        console.log(supplementArray( value ),'12322123')
+                        // console.log(supplementArray( value ),'12322123')
                         setAttribute(dom, key, supplementArray( value ))
                     })
                 }
