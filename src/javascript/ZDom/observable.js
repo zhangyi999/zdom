@@ -7,11 +7,11 @@ import checkTypes from './types'
 //     return arr
 // }
 
-Array.prototype.mapA = function(fn) {
-    const arr = this.Observable?this:[...this]
-    arr.mapCall?arr.mapCall.push(fn):addPorto(arr, 'mapCall', [fn])
-    return arr
-}
+// Array.prototype.mapA = function(fn) {
+//     const arr = this.Observable?this:[...this]
+//     arr.mapCall?arr.mapCall.push(fn):addPorto(arr, 'mapCall', [fn])
+//     return arr
+// }
 
 function addPorto(obj, key, val) {
     Object.defineProperty(obj, key, {
@@ -25,6 +25,11 @@ function addPorto(obj, key, val) {
 function ZdomArray ( arr , callback) {
     if ( !(arr instanceof Array ) ) return arr;
     if ( arr.length === 0 ) arr = ['']
+    addPorto(arr, 'mapCall', [])
+    addPorto(arr, 'mapA', function(fn) {
+        arr.mapCall.push(fn)
+        return arr
+    })
     function add ( newArray ) {
         if ( ! (newArray instanceof Array ) ) newArray = [newArray];
         this.push(...newArray)
@@ -95,32 +100,33 @@ function addObservable( s, Observable ) {
     return val
 }
 
-// return ture is diff
-function undiff( oldData, newData ) {
-    if ( oldData == newData ) return true
-    let diff = true
+// return ture is diff status
+function isDiff( oldData, newData ) {
+    if ( oldData == newData ) return false
+    let diff = false
     if ( checkTypes(oldData) === 'Array' &&  checkTypes(newData) === 'Array' ) {
         const olen = oldData.length
         const nlen = newData.length
-        if ( olen != nlen ) return false
+        if ( olen !== nlen ) return true
         for ( let i = 0; i < olen; i++ ) {
-            if ( undiff( oldData[i], newData[i] ) === false ) {
-                diff = false
+            if ( isDiff( oldData[i], newData[i] ) === true ) {
+                diff = true
                 break; 
             }
         }
         return diff
     }
-
-    if ( checkTypes(oldData) === 'Objcet' &&  checkTypes(newData) === 'Objcet' ) { 
-        for ( i in  oldData ) {
-            if ( undiff( oldData[i], newData[i] ) === false ) {
-                diff = false
+    if ( checkTypes(oldData) === 'Object' &&  checkTypes(newData) === 'Object' ) { 
+        for ( let i in  oldData ) {
+            console.log(i)
+            if ( isDiff( oldData[i], newData[i] ) === true ) {
+                diff = true
                 break; 
             }
         }
         return diff
     }
+    if ( oldData != newData ) return true
 }
 
 function Observable( obj, key, val ) {
@@ -133,7 +139,7 @@ function Observable( obj, key, val ) {
             return oldVal
         }, 
         set(newVal) {
-            if ( undiff( newVal, oldValueData ) ) return
+            if ( isDiff( newVal, oldValueData ) === false ) return
             oldVal = addObservable( newVal, val );
             oldValueData = newVal;
             val.change( oldVal )

@@ -64,25 +64,20 @@ function addChild ( prant, childs ) {
     if ( childs.Observable !== undefined ) {
         childs = childs.Observable;
         let oldValue = childs.props.data[childs.key];
-        // oldValue = supplementArray( oldValue );
-        // console.log(,'oldValue')
-        const thisDomeMapCall = oldValue.mapCall
         let oldEL = initChild( oldValue );
+        const thisDomeMapCall =  oldValue.mapCall?[ ...oldValue.mapCall ]:undefined
+        oldValue.mapCall?oldValue.mapCall.length = 0:'';
         let oldRepalce = oldValue instanceof Array ? Array.from( oldEL.childNodes ) : oldEL ;
         childs.domtree.push( function ( newVal ) {
             if ( newVal.type !== undefined ) {
                 const {data, type, index} = newVal;
-                // console.log( ,'dataa')
+                data.mapCall.length = 0
+                data.mapCall.push(...thisDomeMapCall)
                 oldRepalce = ArrayElement[type]( prant, oldRepalce, data, index );
             } else {
-                // if ( typeof newVal === 'string' || typeof newVal === 'number' ) newVal = supplementArray( newVal );
                 if ( newVal instanceof Array ) {
-                    Object.defineProperty(newVal, 'mapCall', {
-                        enumerable: false,
-                        configurable: false,
-                        writable: false,
-                        value: thisDomeMapCall
-                    })
+                    newVal.mapCall.length = 0
+                    newVal.mapCall.push(...thisDomeMapCall)
                 }
                 oldRepalce = replaceDom( prant, oldRepalce , newVal );
             }
