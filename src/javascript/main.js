@@ -1,6 +1,5 @@
 import dom,{
     Commponent,
-    JoinData,
     Observable,
     ObjectMap,
     getPageData
@@ -19,11 +18,11 @@ const Header = Commponent(header)
 // 数据绑定
 function content( ) {
     const times = this.data('time', new Date().Format('yy.MM.dd hh:mm:ss'))
-    this.loaded = () => {
-        setInterval(()=>{
-            this.data.time = new Date().Format('yy.MM.dd hh:mm:ss')
-        },1000)
-    }
+    // this.loaded = () => {
+    //     setInterval(()=>{
+    //         this.data.time = new Date().Format('yy.MM.dd hh:mm:ss')
+    //     },1000)
+    // }
     return (
         dom.div({class: 'z_dom_content'},
             dom.p({},'the time now'),
@@ -37,7 +36,7 @@ const Content = Commponent(content)
 function childCommponent( ) {
     return (
         dom.div({
-            class: JoinData( this.data.class , ' <l')
+            class: [ this.data.class , ' <l' ]
         },
             dom.p({},'this is childCommponent')
         )
@@ -48,13 +47,19 @@ const ChildCommponent = Commponent(childCommponent)
 function prantCommponent( ...child ) {
     return (
         dom.div({
-            class : JoinData( this.data.class , ' z_dom_prantcommponent ')
+            class : [ this.data.class , ' z_dom_prantcommponent ']
         },
             dom.p({},'this is PrantCommponent'),
             ChildCommponent({
-                class: JoinData( this.data.class , ' <z')
+                class: [ this.data.class , ' <z']
             }),
-            child
+            child,
+            dom.div({},
+                this.data.list.mapA( v => dom.p({},
+                    dom.b({},v.b),
+                    dom.span({},v.s)
+                ))
+            )
         )
     )
 }
@@ -62,29 +67,57 @@ const PrantCommponent = Commponent(prantCommponent)
 
 const statics = Observable();
 var a = '111'
-const ks = {
-    get: () => {
-     return a
-    }
-}
 function Index() {
-    const img = statics.data('img','a')
+    const {
+        img,
+        list
+    } = statics.data({
+        img: 'a',
+        list: [
+            {b:1,s:3},
+            {b:1,s:5},
+            {b:1,s:4}
+        ]
+    })
+    // console.log(img)
     return (
         dom.div({class:'z_dom_index'},
             // Header({},'hello word!'),
-            Content({}),
-            PrantCommponent({ class: JoinData(statics.data('pantent','a'), ks )}),
-            dom.img({src: JoinData( './static/img/',img,'.jpg' ) }),
+            // Content({list}),
+            PrantCommponent({ 
+                class: [ statics.data('pantent','a') ],
+                list
+            }),
+            dom.img({src: [ './static/img/',img,'.jpg' ] }),
             dom.a({
                 '@click': change
-            },'修改 class')
+            },'修改 arr'),
+            dom.a({
+                '@click': change1
+            },'修改 0'),
+            dom.h1({$innerHTML: [ '<p>', img, '</p>']}),
+            list.mapA( v => {
+                return dom.p({}, v.b )
+            })
         )
     )
 }
 
+function change1() {
+    statics.data.list.replace(2,[{b:6,s:'y'},{b:10,s:'y1'}])
+}
+
 function change() {
     statics.data.img = 'g'
-    console.log(statics.data.pantent)
+
+    statics.data.list = [
+        {b:1,s:3},
+        {b:1,s:5},
+        {b:1,s:4}
+    ]
+    // console.log(statics.data.pantent)
+
+    // console.log([statics.data.list])
 }
 
 setTimeout(()=>{

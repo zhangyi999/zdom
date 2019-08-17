@@ -7,6 +7,7 @@ function setAttribute(dom, key, attrs) {
     if(key === 'value') return dom.value = attrs || ''
     if(key === 'checked') return dom.checked = attrs == true
     if(key === 'disabled') return dom.disabled = attrs == true
+    if(key === '$innerHTML') return dom.innerHTML = attrs
     dom.setAttribute(key, attrs);
 }
 
@@ -63,17 +64,21 @@ function addChild ( prant, childs ) {
     if ( childs.Observable !== undefined ) {
         childs = childs.Observable;
         let oldValue = childs.props.data[childs.key];
-        oldValue = childs.supplement( oldValue );
         let oldEL = initChild( oldValue );
+        const thisDomeMapCall =  oldValue.mapCall?[ ...oldValue.mapCall ]:undefined
+        oldValue.mapCall?oldValue.mapCall.length = 0:'';
         let oldRepalce = oldValue instanceof Array ? Array.from( oldEL.childNodes ) : oldEL ;
         childs.domtree.push( function ( newVal ) {
             if ( newVal.type !== undefined ) {
                 const {data, type, index} = newVal;
-                // console.log( ,'dataa')
+                data.mapCall.length = 0
+                data.mapCall.push(...thisDomeMapCall)
                 oldRepalce = ArrayElement[type]( prant, oldRepalce, data, index );
             } else {
-                if ( typeof newVal === 'string' || typeof newVal === 'number' ) newVal = childs.supplement( newVal );
-                // console.log( newVal )
+                if ( newVal instanceof Array ) {
+                    newVal.mapCall.length = 0
+                    newVal.mapCall.push(...thisDomeMapCall)
+                }
                 oldRepalce = replaceDom( prant, oldRepalce , newVal );
             }
         });
@@ -84,10 +89,9 @@ function addChild ( prant, childs ) {
         }
     } else if ( childs instanceof Array ) {
         const len =  childs.length;
-        const mapCall  = childs.mapCall
         for( let i = 0; i < len; i ++) {
             const child = childs[i];
-            addChild( prant, mapCall?mapCall(child,i): child);
+            addChild( prant, child );
         }
     } else if ( childs instanceof Element || childs instanceof Text || childs instanceof DocumentFragment ) {
         prant.appendChild(childs)
@@ -110,10 +114,22 @@ function initChild( childs ) {
 function randerArray(arr) {
     if(arr instanceof Array) {
         const div = document.createDocumentFragment()
-        arr.map( v => {
-            const dom = initChild(arr.mapCall ? arr.mapCall(v) : v)
-            div.appendChild(dom)
-        })
+        const mapCall = arr.mapCall
+        if ( mapCall !== undefined ) {
+            arr.map( v => {
+                let v1 = v;
+                mapCall.map( fn => {
+                    v1 = fn(v1)
+                })
+                const dom = initChild( v1 )
+                div.appendChild(dom)
+            })
+        } else {
+            arr.map( v => {
+                const dom = initChild( v )
+                div.appendChild(dom)
+            })
+        }
         return div
     } else {
         throw 'randerArray 仅处理数组'
@@ -148,18 +164,20 @@ function replaceDom( dom , oldDom, newDom ) {
     return oldRepalce;
 }
 
+function supplementArray( arr ) {
+    let supplement = ''
+    arr.map( v => {
+        supplement += v.Observable?v.Observable.get():v
+    })
+    return supplement
+}
 
-
-function creatElement(type ,arr, ...childs) {
-    const dom = document.createElement(type);
+function mapAttr( dom, arr ) {
     ObjectMap(arr, ( value, key ) => {
         if(!value && value !== 0 ) return
+
         if(key === '$data') {
             dom.$data = value
-            return;
-        }
-        if(key === '$innerHTML') {
-            dom.innerHTML = value
             return;
         }
 
@@ -188,24 +206,26 @@ function creatElement(type ,arr, ...childs) {
         }
 
         if ( value instanceof Array ) {
-            let strStatus = true, str = ''
+            value = value.flat(Infinity);
             value.map( v => {
-                if ( typeof v === 'string' || typeof v === 'number' ) return str += v
                 if ( v.Observable !== undefined ) {
                     v = v.Observable
-                    strStatus = false
-                    v.attrtree.push( function ( newVal ) {
-                        setAttribute(dom, key, v.supplement( newVal, value ) )
+                    // console.log(value,'123123')
+                    v.attrtree.push( function ( ) {
+                        // console.log(supplementArray( value ),'12322123')
+                        setAttribute(dom, key, supplementArray( value ))
                     })
-                    
-                    return setAttribute(dom, key, v.supplement( v.value, value ) )
                 }
             })
-            strStatus? setAttribute(dom, key, str ):''
-            return
+            return setAttribute( dom, key, supplementArray( value ) )
         }
         setAttribute(dom, key, value )
     })
+}
+
+function creatElement(type ,arr, ...childs) {
+    const dom = document.createElement(type);
+    mapAttr( dom, arr );
     addChild(dom, ...childs)
     return dom
 }

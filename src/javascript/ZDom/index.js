@@ -15,28 +15,11 @@ function getPageData() {
     return data
 }
 
-function JoinData( ) {
-    const arg = [...arguments];
-    let i = 0, len = arg.length;
-    const supplementArr = []
-    while ( i < len ) {
-        const argValue = arg[i];
-        i++;
-        if ( argValue === undefined ) continue;
-        if ( argValue instanceof Array ) {
-            supplementArr.push(...argValue);
-            continue;
-        }
-        supplementArr.push(argValue);
-    }
-    return supplementArr
-}
 
 export default dom
 
 export {
     Commponent,
-    JoinData,
     Observable,
     ObjectMap,
     getPageData

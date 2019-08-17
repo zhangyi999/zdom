@@ -1,10 +1,17 @@
 import {ObjectMap} from './public'
+import checkTypes from './types'
 
-Array.prototype.mapA = function(fn) {
-    const arr = this.Observable?this:[...this]
-    addPorto(arr, 'mapCall', fn)
-    return arr
-}
+// Array.prototype.mapA = function(fn) {
+//     const arr = this.Observable?this:[...this]
+//     addPorto(arr, 'mapCall', [])
+//     return arr
+// }
+
+// Array.prototype.mapA = function(fn) {
+//     const arr = this.Observable?this:[...this]
+//     arr.mapCall?arr.mapCall.push(fn):addPorto(arr, 'mapCall', [fn])
+//     return arr
+// }
 
 function addPorto(obj, key, val) {
     Object.defineProperty(obj, key, {
@@ -18,6 +25,11 @@ function addPorto(obj, key, val) {
 function ZdomArray ( arr , callback) {
     if ( !(arr instanceof Array ) ) return arr;
     if ( arr.length === 0 ) arr = ['']
+    addPorto(arr, 'mapCall', [])
+    addPorto(arr, 'mapA', function(fn) {
+        arr.mapCall.push(fn)
+        return arr
+    })
     function add ( newArray ) {
         if ( ! (newArray instanceof Array ) ) newArray = [newArray];
         this.push(...newArray)
@@ -88,6 +100,35 @@ function addObservable( s, Observable ) {
     return val
 }
 
+// return ture is diff status
+function isDiff( oldData, newData ) {
+    if ( oldData == newData ) return false
+    let diff = false
+    if ( checkTypes(oldData) === 'Array' &&  checkTypes(newData) === 'Array' ) {
+        const olen = oldData.length
+        const nlen = newData.length
+        if ( olen !== nlen ) return true
+        for ( let i = 0; i < olen; i++ ) {
+            if ( isDiff( oldData[i], newData[i] ) === true ) {
+                diff = true
+                break; 
+            }
+        }
+        return diff
+    }
+    if ( checkTypes(oldData) === 'Object' &&  checkTypes(newData) === 'Object' ) { 
+        for ( let i in  oldData ) {
+            console.log(i)
+            if ( isDiff( oldData[i], newData[i] ) === true ) {
+                diff = true
+                break; 
+            }
+        }
+        return diff
+    }
+    if ( oldData != newData ) return true
+}
+
 function Observable( obj, key, val ) {
     let oldValueData = val.value
     let oldVal = addObservable( oldValueData, val );
@@ -98,9 +139,7 @@ function Observable( obj, key, val ) {
             return oldVal
         }, 
         set(newVal) {
-            if (newVal == oldValueData && oldValueData !== '') {
-                return;
-            }
+            if ( isDiff( newVal, oldValueData ) === false ) return
             oldVal = addObservable( newVal, val );
             oldValueData = newVal;
             val.change( oldVal )
@@ -108,6 +147,22 @@ function Observable( obj, key, val ) {
     });
     return obj
 } 
+
+/** 
+ * Data() 的作用是创建钩子
+ * 钩子数据结构
+ * data = {
+ *  key,
+ *  initValue,
+ *  props,
+ *  domtree,
+ *  attrtree,
+ *  change,
+ *  watch,
+ *  get
+ * }
+ * 
+ *  */
 
 function Props( attr ) {
     const props = {
@@ -144,14 +199,6 @@ function Props( attr ) {
                 props.watch[key].map( v => v(newValue) );
             },
             props,
-            supplement: (newVal, supple) => {
-                if ( supple === undefined ) return newVal
-                let supplement = ''
-                supple.map( v => {
-                    supplement += v.Observable?v.Observable.get():v
-                })
-                return supplement
-            },
             watch : callback => props.watch[key].push(callback.bind(props)),
             set( n ) {
                 props.data[key] = n
