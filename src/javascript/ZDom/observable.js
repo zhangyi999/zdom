@@ -1,18 +1,6 @@
 import {ObjectMap} from './public'
 import checkTypes from './types'
 
-// Array.prototype.mapA = function(fn) {
-//     const arr = this.Observable?this:[...this]
-//     addPorto(arr, 'mapCall', [])
-//     return arr
-// }
-
-// Array.prototype.mapA = function(fn) {
-//     const arr = this.Observable?this:[...this]
-//     arr.mapCall?arr.mapCall.push(fn):addPorto(arr, 'mapCall', [fn])
-//     return arr
-// }
-
 function addPorto(obj, key, val) {
     Object.defineProperty(obj, key, {
         enumerable: false,
@@ -42,6 +30,7 @@ function ZdomArray ( arr , callback) {
 
     function replace (index, newValue) {
         if ( ! (newValue instanceof Array ) ) newValue = [newValue];
+        if ( isDiff( this[index], newValue[0] ) === false ) return
         this.splice( index, newValue.length, ...newValue );
         newValue.mapCall?'':addPorto(newValue, 'mapCall', this.mapCall)
         callback({

@@ -55,10 +55,10 @@ function prantCommponent( ...child ) {
             }),
             child,
             dom.div({},
-                this.data.list.mapA( v => dom.p({},
-                    dom.b({},v.b),
-                    dom.span({},v.s)
-                ))
+                // this.data.list.mapA( v => dom.p({},
+                //     dom.b({},v.b),
+                //     dom.span({},v.s)
+                // ))
             )
         )
     )
@@ -74,9 +74,8 @@ function Index() {
     } = statics.data({
         img: 'a',
         list: [
-            {b:1,s:3},
-            {b:1,s:5},
-            {b:1,s:4}
+            true,
+            false
         ]
     })
     // console.log(img)
@@ -97,14 +96,18 @@ function Index() {
             },'修改 0'),
             dom.h1({$innerHTML: [ '<p>', img, '</p>']}),
             list.mapA( v => {
-                return dom.p({}, v.b )
+                console.log(v)
+                return dom.input({
+                    type: 'checkbox',
+                    checked: v 
+                } )
             })
         )
     )
 }
 
 function change1() {
-    statics.data.list.replace(2,[{b:6,s:'y'},{b:10,s:'y1'}])
+    statics.data.list.replace(1,[true])
 }
 
 function change() {
