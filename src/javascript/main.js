@@ -43,8 +43,13 @@ function childCommponent( ) {
     )
 }
 const ChildCommponent = Commponent(childCommponent)
+function sssssss() {
+    this.data.kk = [1,3,2]
 
+    console.log ( this.data.kk)
+}
 function prantCommponent( ...child ) {
+    const kk = this.data('kk',0x00312312)
     return (
         dom.div({
             class : [ this.data.class , ' z_dom_prantcommponent ']
@@ -55,28 +60,34 @@ function prantCommponent( ...child ) {
             }),
             child,
             dom.div({},
+                kk
                 // this.data.list.mapA( v => dom.p({},
                 //     dom.b({},v.b),
                 //     dom.span({},v.s)
                 // ))
-            )
+            ),
+            dom.a({
+                '@click': sssssss.bind(this)
+            },'ddddddddd-----ddddd')
         )
     )
 }
 const PrantCommponent = Commponent(prantCommponent)
 
 const statics = Observable();
+const arr = Observable()
 var a = '111'
 function Index() {
+    const lii = [ true, false ]
+    
     const {
         img,
-        list
+        list,
+        kk
     } = statics.data({
         img: 'a',
-        list: [
-            true,
-            false
-        ]
+        list: arr.data(lii),
+        kk: [1,3,2]
     })
     // console.log(img)
     return (
@@ -92,16 +103,16 @@ function Index() {
                 '@click': change
             },'修改 arr'),
             dom.a({
-                '@click': change1
+                '@click': change1.bind(this)
             },'修改 0'),
             dom.h1({$innerHTML: [ '<p>', img, '</p>']}),
             list.mapA( v => {
-                console.log(v)
                 return dom.input({
                     type: 'checkbox',
                     checked: v 
                 } )
-            })
+            }),
+            dom.div({},kk)
         )
     )
 }
@@ -125,7 +136,8 @@ function change() {
 
 setTimeout(()=>{
     a  = '22222'
-    statics.data.pantent = 'b'
+    arr.data[1] = true
+    console.log(statics.data.l2 == true)
 },5000)
 
 document.getElementById('app').appendChild(Index())

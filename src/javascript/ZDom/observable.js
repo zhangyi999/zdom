@@ -107,7 +107,6 @@ function isDiff( oldData, newData ) {
     }
     if ( checkTypes(oldData) === 'Object' &&  checkTypes(newData) === 'Object' ) { 
         for ( let i in  oldData ) {
-            console.log(i)
             if ( isDiff( oldData[i], newData[i] ) === true ) {
                 diff = true
                 break; 
@@ -161,11 +160,10 @@ function Props( attr ) {
     };
     function initData ( key, value ) {
         if ( typeof key === 'object' ) {
-            const data = {}
             ObjectMap( key, function( v, k ){
-                data[k] = initData( k, v );
+                key[k] = initData( k, v );
             });
-            return data;
+            return key;
         }
         if ( value.Observable !== undefined ) {
             Observable( props, key, value.Observable )
