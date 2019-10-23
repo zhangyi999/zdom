@@ -166,7 +166,7 @@ function replaceDom( dom , oldDom, newDom ) {
 
 function supplementArray( arr ) {
     let supplement = ''
-    arr.map( v => {
+    arr.map( (v = '') => {
         supplement += v.Observable?v.Observable.get():v
     })
     return supplement
@@ -207,7 +207,7 @@ function mapAttr( dom, arr ) {
 
         if ( value instanceof Array ) {
             value = value.flat(Infinity);
-            value.map( v => {
+            value.map( (v = '') => {
                 if ( v.Observable !== undefined ) {
                     v = v.Observable
                     // console.log(value,'123123')
