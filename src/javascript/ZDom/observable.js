@@ -29,8 +29,12 @@ function ZdomArray ( arr , callback) {
     }
 
     function replace (index, newValue) {
-        if ( ! (newValue instanceof Array ) ) newValue = [newValue];
-        if ( isDiff( this[index], newValue[0] ) === false ) return
+        if ( newValue instanceof Function ) {
+            newValue = [newValue(this[index])] 
+        } else {
+            if ( ! (newValue instanceof Array ) ) newValue = [newValue];
+            if ( isDiff( this[index], newValue[0] ) === false ) return
+        }
         this.splice( index, newValue.length, ...newValue );
         newValue.mapCall?'':addPorto(newValue, 'mapCall', this.mapCall)
         callback({
