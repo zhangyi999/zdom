@@ -207,8 +207,8 @@ function mapAttr( dom, arr ) {
 
         if ( value instanceof Array ) {
             value = value.flat(Infinity);
-            value.map( (v = '') => {
-                if ( v.Observable !== undefined ) {
+            value.map( v => {
+                if ( v !== undefined && v.Observable !== undefined ) {
                     v = v.Observable
                     // console.log(value,'123123')
                     v.attrtree.push( function ( ) {

@@ -33,6 +33,7 @@ function ZdomArray ( arr , callback) {
     }
 
     function replace (index, newValue) {
+        if ( index instanceof Function ) index = this.findIndex(index)
         if ( newValue instanceof Function ) {
             newValue = [newValue(this[index])] 
         } else {
