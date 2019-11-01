@@ -77,7 +77,7 @@ function addChild ( prant, childs ) {
             } else {
                 if ( newVal instanceof Array ) {
                     newVal.mapCall.length = 0
-                    newVal.mapCall.push(...thisDomeMapCall)
+                    thisDomeMapCall?newVal.mapCall.push(...thisDomeMapCall):''
                 }
                 oldRepalce = replaceDom( prant, oldRepalce , newVal );
             }
@@ -116,10 +116,10 @@ function randerArray(arr) {
         const div = document.createDocumentFragment()
         const mapCall = arr.mapCall
         if ( mapCall !== undefined ) {
-            arr.map( v => {
+            arr.map( (v,i) => {
                 let v1 = v;
                 mapCall.map( fn => {
-                    v1 = fn(v1)
+                    v1 = fn(v1,i)
                 })
                 const dom = initChild( v1 )
                 div.appendChild(dom)
@@ -166,7 +166,7 @@ function replaceDom( dom , oldDom, newDom ) {
 
 function supplementArray( arr ) {
     let supplement = ''
-    arr.map( v => {
+    arr.map( (v = '') => {
         supplement += v.Observable?v.Observable.get():v
     })
     return supplement
@@ -200,15 +200,15 @@ function mapAttr( dom, arr ) {
         if ( value.Observable !== undefined ) {
             value = value.Observable;
             value.attrtree.push( function ( newVal ) {
-                setAttribute(dom, key, value.supplement( newVal ) )
+                setAttribute(dom, key, value.get() )
             })
-            return setAttribute(dom, key, value.supplement( value.value ) );
+            return setAttribute(dom, key, value.get() );
         }
 
         if ( value instanceof Array ) {
             value = value.flat(Infinity);
             value.map( v => {
-                if ( v.Observable !== undefined ) {
+                if ( v !== undefined && v.Observable !== undefined ) {
                     v = v.Observable
                     // console.log(value,'123123')
                     v.attrtree.push( function ( ) {

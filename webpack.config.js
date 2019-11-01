@@ -9,6 +9,9 @@ module.exports = {
     entry: { 
         index: path.resolve(__dirname, './'+index+'/javascript', 'main.js'),
         // vendor:'lodash' // 多个页面所需的公共库文件，防止重复打包带入 
+    },
+    node: {
+        fs: 'empty'
     }, 
     resolve:{ 
         extensions: [".js",".css",".json"], 

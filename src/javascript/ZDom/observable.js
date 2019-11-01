@@ -1,18 +1,6 @@
 import {ObjectMap} from './public'
 import checkTypes from './types'
 
-// Array.prototype.mapA = function(fn) {
-//     const arr = this.Observable?this:[...this]
-//     addPorto(arr, 'mapCall', [])
-//     return arr
-// }
-
-// Array.prototype.mapA = function(fn) {
-//     const arr = this.Observable?this:[...this]
-//     arr.mapCall?arr.mapCall.push(fn):addPorto(arr, 'mapCall', [fn])
-//     return arr
-// }
-
 function addPorto(obj, key, val) {
     Object.defineProperty(obj, key, {
         enumerable: false,
@@ -20,6 +8,10 @@ function addPorto(obj, key, val) {
         writable: false,
         value: val
     })
+}
+
+Array.prototype.mapA = function(fun) {
+    return this.map(fun)
 }
 
 function ZdomArray ( arr , callback) {
@@ -41,7 +33,14 @@ function ZdomArray ( arr , callback) {
     }
 
     function replace (index, newValue) {
-        if ( ! (newValue instanceof Array ) ) newValue = [newValue];
+        if ( index instanceof Function ) index = this.findIndex(index)
+        if ( newValue instanceof Function ) {
+            newValue = [newValue(this[index])] 
+        } else {
+            if ( ! (newValue instanceof Array ) ) newValue = [newValue];
+            if ( isDiff( this[index], newValue[0] ) === false ) return
+        }
+        
         this.splice( index, newValue.length, ...newValue );
         newValue.mapCall?'':addPorto(newValue, 'mapCall', this.mapCall)
         callback({
@@ -118,7 +117,6 @@ function isDiff( oldData, newData ) {
     }
     if ( checkTypes(oldData) === 'Object' &&  checkTypes(newData) === 'Object' ) { 
         for ( let i in  oldData ) {
-            console.log(i)
             if ( isDiff( oldData[i], newData[i] ) === true ) {
                 diff = true
                 break; 
@@ -172,11 +170,10 @@ function Props( attr ) {
     };
     function initData ( key, value ) {
         if ( typeof key === 'object' ) {
-            const data = {}
             ObjectMap( key, function( v, k ){
-                data[k] = initData( k, v );
+                key[k] = initData( k, v );
             });
-            return data;
+            return key;
         }
         if ( value.Observable !== undefined ) {
             Observable( props, key, value.Observable )
