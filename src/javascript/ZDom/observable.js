@@ -10,6 +10,10 @@ function addPorto(obj, key, val) {
     })
 }
 
+Array.prototype.mapA = function(fun) {
+    return this.map(fun)
+}
+
 function ZdomArray ( arr , callback) {
     if ( !(arr instanceof Array ) ) return arr;
     if ( arr.length === 0 ) arr = ['']
@@ -35,6 +39,7 @@ function ZdomArray ( arr , callback) {
             if ( ! (newValue instanceof Array ) ) newValue = [newValue];
             if ( isDiff( this[index], newValue[0] ) === false ) return
         }
+        
         this.splice( index, newValue.length, ...newValue );
         newValue.mapCall?'':addPorto(newValue, 'mapCall', this.mapCall)
         callback({

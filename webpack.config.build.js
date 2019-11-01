@@ -18,6 +18,9 @@ module.exports = {
         path: __dirname+'/build/', //这里会把 js css html 三个文件放到一起
         filename:'[name].js' 
     }, 
+    node: {
+        fs: 'empty'
+    },
     resolve:{ 
         extensions: [".js",".css",".json"]
     }, 
