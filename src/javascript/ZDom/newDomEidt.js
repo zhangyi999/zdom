@@ -4,20 +4,83 @@ import Obs from './Obs'
 
 import {ObjectMap} from './public'
 
-function addObsDom( prant, Obs ) {
-    const renders = Obs.renders
-    const value = Obs.get
 
-    switch (value) {
-        case value instanceof Array:
-            
-            break;
-        case value instanceof Object:
-        
-            break;
-        default:
-            break;
+function addElemens ( p, newElement, targetElement) {
+    if (p.lastChild == targetElement) {
+        p.appendChild(newElement);
+    } else {
+        p.insertBefore(newElement, targetElement.nextSibling);
     }
+}
+
+// domtree: 0 | 从头部增加，1 | 从尾部增加， 2 | 删除，3 | 替换 
+const ArrayElement = [
+    ( prant, oldRepalce, newArray ) => {
+        // 从头部增加
+        const addElement = initChild(newArray);
+        const indexEl = oldRepalce[0];
+        oldRepalce.unshift( ...Array.from( addElement.childNodes ) );
+        prant.insertBefore( addElement, indexEl );
+        return oldRepalce;
+    },
+    ( prant, oldRepalce, newArray ) => {
+        // 从尾部增加
+        const addElement = initChild(newArray);
+        const newPr = oldRepalce.concat( Array.from( addElement.childNodes ));
+        addElemens(prant, addElement,oldRepalce[oldRepalce.length -1] )
+        return newPr
+    },
+    ( prant, oldRepalce, data ) => {
+        // 删除
+        const { index, n } = data;
+        for ( let i = index; i < index*1 + n*1; i ++ ) {
+            oldRepalce[i].ondie?oldRepalce[i].ondie():'';
+            oldRepalce[i].remove();
+        }
+        oldRepalce.splice( index, n );
+        return oldRepalce;
+    },
+    ( prant, oldRepalce, newArray, index ) => {
+        // 替换
+        const addElement = initChild(newArray);
+        const newArrayLen = newArray.length;
+        const indexDom = oldRepalce[index];
+        const childArr = Array.from( addElement.childNodes );
+        prant.replaceChild( addElement ,indexDom );
+        for( let i = index*1 + 1; i < index*1 + newArrayLen; i ++ ) {
+            const v = oldRepalce[i];
+            if( v === undefined ) break;
+            v.ondie?v.ondie():'';
+            v.remove()
+        }
+        oldRepalce.splice( index, newArrayLen, ...childArr );
+        return oldRepalce;
+    }
+]
+
+// domtree: 0 | 从头部增加，1 | 从尾部增加， 2 | 删除，3 | 替换  
+function replaceDom( type, prant, oldDom, newRender ) {
+    const newDom = newRender()
+}
+
+
+
+function addObsDom( prant, Obs ) {
+    const {render,renders} = Obs
+    let oldDom = addChild ( prant, render() )
+    Obs.domtree.push((type) => {
+        Obs.renders = renders
+        oldDom = replaceDom( type, prant, oldDom, render )
+        Obs.renders = []
+    })
+    // 初始化
+    Obs.renders = []
+}
+
+function creatDocumentFragment(childs) {
+    const dom = document.createDocumentFragment()
+    addChild ( dom, childs )
+    return dom
 }
 
 function addChild ( prant, childs ) {
