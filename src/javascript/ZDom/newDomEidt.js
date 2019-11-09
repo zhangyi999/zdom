@@ -63,7 +63,7 @@ function replaceDom( type, prant, oldDom, Obs ) {
 
 
 function addObsDom( prant, Obs ) {
-    const {renders} = Obs
+    const renders = [...Obs.renders]
     const fragment =  creatDocumentFragment ( Obs.render() )
     let oldDom = Array.from( fragment.childNodes )
     prant.appendChild( fragment )
@@ -146,7 +146,6 @@ function mapAttr( dom, arr ) {
         }
 
         if ( value instanceof Obs ) {
-            value = value.Observable;
             value.attrtree.push( function ( ) {
                 setAttribute(dom, key, value.get )
             })

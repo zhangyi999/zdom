@@ -1,53 +1,30 @@
-import Obs from './ZDom/Obs'
+
 import dom from './ZDom/newDomEidt'
 
-import {ObjectMapFull, ObjectMap} from './ZDom/public'
+import observable from './ZDom/observable'
 
-import checkTypes from './ZDom/types'
+const [ $, obs ] = observable( {
+    num: 1,
+    b:{
+        a:2
+    },
+    g: [1,2,3,4,5],
+    old: true
+} )
 
-const date = new Obs({a: new Obs(dom.b({},'HH')), b: new Obs(33)})
-
-// function ObjectMapFullFilterObs( obj, call ) {
-    
-//     if ( obj instanceof Obs ) return ObjectMapFullFilterObs( obj, call )
-//     return ObjectMap(obj, (v, k) => {
-//         if ( filter && obj instanceof filter ) return call(v, k)
-//         if ( checkTypes( v ) === 'Object') return ObjectMapFull(v, call, {filter})
-//         if ( checkTypes( v ) === 'Array' ) return v.map( v => ObjectMapFull( v, call , {filter}))
-//         return call(v, k)
-//     })
-// }
-
-
-const date1 = {
-    a:1,
-    b:'3',
-    c:[
-        1,
-        {
-            i:{
-                j:'31'
-            }
-        }
-    ],
-    g: {
-        // h:21,
-        i:{
-            j:'31',
-            l: {
-                a: 1
-            }
-        }
-    }
-}
 
 
 setTimeout(()=>{
 
-    console.log( Object.keys(date) )
-    date.get.a.set(dom.b({},'321312'))
-    date.get.b.set('ggg')
-
+    // console.log( Object.keys(date) )
+    // date.get.a.set(dom.b({},'321312'))
+    // date.get.b.set('ggg')
+    obs.b.a = ('pppppp')
+    console.log (
+        $
+    )
+    obs.old = false
+    obs.g[1] = 123312312
     // console.log ( 
     //     ObjectMapFull(date, (v, k) => {
     //         return v + 'id' + k
@@ -55,13 +32,25 @@ setTimeout(()=>{
     //     checkTypes(date)
     //  )
 
-},1000)
+},2000)
+
+function cccc( {checked} = {}) {
+    obs.old = checked
+    console.log( obs.old )
+}
 
 function Index() {
-    console.log ( date )
+    console.log (  $.b.a )
     return (
         dom.div({},
-            dom.h2({},date.map( v => dom.p({class: ['jj-',v.b]},v.a)))
+            dom.h2({},$.b.a),
+            // dom.h2({},date.map( v => dom.p({class: ['jj-',v.b]},v.a))),
+            dom.h1({class: ['show-', $.old] }, 
+                $.old.map( v => v?'ddd':'saaaa'), 
+                $.num.map( v => dom.p({},v))
+            ),
+            dom.input({type:"checkbox", checked: $.old, '@change': cccc}),
+            $.g.map( v => dom.p({},v) )
         )
     )
 }

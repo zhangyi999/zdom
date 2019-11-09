@@ -40,16 +40,16 @@ function addPorto(obj, key, val) {
 // domtree: 0 | 从头部增加，1 | 从尾部增加， 2 | 删除，3 | 替换  
 class Obs {
     constructor( valueAny ) {
-        this.initValue = valueAny
+        // this.renders = [] 
         // this.domtree = []
         // this.attrtree = []
         // this.watch = []
-        this.get = valueAny
-        // this.renders = [] 
         addPorto(this, 'domtree', [])
         addPorto(this, 'attrtree', [])
         addPorto(this, 'watch', [])
         addPorto(this, 'renders', [])
+        addPorto(this, 'initValue', valueAny)
+        this.get = valueAny
         this.set = ( newValue ) => {
             if ( isDiff( newValue, this.get ) === false ) return
             this.get = newValue
