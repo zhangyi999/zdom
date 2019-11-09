@@ -1,15 +1,15 @@
 import Obs from './Obs'
 import { ObjectMap } from './public'
 
-function Observable( obj, key, Obs ) {
+function Observable( obj, key, obsDomObj ) {
     Object.defineProperty(obj, key, {
         enumerable: true, // 可枚举
         configurable: true, // fales 不能再define
         get() {
-            return Obs.get
+            return obsDomObj[key].get
         }, 
         set(newVal) {
-            Obs.set( newVal )
+            obsDomObj[key].set( newVal )
         }
     });
     return obj
@@ -34,7 +34,7 @@ function bindObs( obsDomObj, obsDataObj, key, value ) {
         return
     }
     obsDomObj[key] = new Obs(value)
-    Observable( obsDataObj, key, obsDomObj[key] )
+    Observable( obsDataObj, key, obsDomObj )
 }
 
 function initDataObs( Obj ) {
