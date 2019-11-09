@@ -55,8 +55,9 @@ const ArrayElement = [
 ]
 
 // domtree: 0 | 从头部增加，1 | 从尾部增加， 2 | 删除，3 | 替换  
-function replaceDom( type, prant, oldDom, Obs ) {
-    const newDom = Obs.render()
+function replaceDom( type, prant, oldDom, Obs, newValue ) {
+    console.log ( Obs )
+    const newDom = Obs.render( newValue )
     return ArrayElement[type]( prant, oldDom, newDom )
 }
 
@@ -67,9 +68,10 @@ function addObsDom( prant, Obs ) {
     const fragment =  creatDocumentFragment ( Obs.render() )
     let oldDom = Array.from( fragment.childNodes )
     prant.appendChild( fragment )
-    Obs.domtree.push((type) => {
+    Obs.domtree.push((type, newValue) => {
         Obs.renders.push(...renders)
-        oldDom = replaceDom( type, prant, oldDom, Obs )
+        console.log ( Obs.renders )
+        oldDom = replaceDom( type, prant, oldDom, Obs, newValue )
         Obs.renders.length = 0
     })
     // 初始化

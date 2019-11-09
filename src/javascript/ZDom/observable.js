@@ -1,4 +1,4 @@
-import Obs from './Obs'
+import Obs, {addPorto} from './Obs'
 import { ObjectMap } from './public'
 
 function Observable( obj, key, obsDomObj ) {
@@ -17,8 +17,18 @@ function Observable( obj, key, obsDomObj ) {
 
 function bindObs( obsDomObj, obsDataObj, key, value ) {
     if ( value instanceof Array ) {
-        obsDomObj[key] = []
+        obsDomObj[key] = new Obs([])
+        addPorto(obsDomObj[key], 'add', newArr => obsDomObj[key][ obsDomObj[key].length ].push(newArr))
+
         obsDataObj[key] = []
+        addPorto(obsDataObj[key], 'add', newArr => {
+            // const newA = [], newDome = []
+            // newArr.map( (v,i) => {
+            //     bindObs( newDome, newA, i, v )
+            // })
+            // obsDataObj[key].push(...newA)
+            obsDomObj[key].push(newArr)
+        })
         value.map( (v,i) => {
             bindObs( obsDomObj[key], obsDataObj[key], i, v )
         })
@@ -33,7 +43,7 @@ function bindObs( obsDomObj, obsDataObj, key, value ) {
         })
         return
     }
-    obsDomObj[key] = new Obs(value)
+    obsDomObj.get instanceof Array ? obsDomObj.get.push( new Obs(value) ) : obsDomObj[key] =  new Obs(value)
     Observable( obsDataObj, key, obsDomObj )
 }
 

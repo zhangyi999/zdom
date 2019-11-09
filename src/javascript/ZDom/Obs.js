@@ -60,7 +60,17 @@ class Obs {
 
     }
 
-    
+    push( newValue ) {
+        this.domtree.map( v => v( 1, newValue) )
+    }
+
+    unshift( newValue ) {
+        this.domtree.map( v => v( 0, newValue) )
+    }
+
+    rmove() {
+        this.domtree.map( v => v( 2 ) )
+    }
 
     map( fun ) {
         this.renders.push(fun)
@@ -75,14 +85,14 @@ class Obs {
         return prvValue
     }
 
-    renderArray () {
-        return this.get.map( (v,i) => this.renderValue ( v, i ))
+    renderArray ( newValue ) {
+        return newValue.map( (v,i) => this.renderValue ( v, i ))
     }
 
-    render( ) {
-        if ( this.renders.length === 0 ) return this.get
-        if ( this.get instanceof Array ) return this.renderArray()
-        return this.renderValue ( this.get )
+    render( newValue = this.get ) {
+        if ( this.renders.length === 0 ) return newValue
+        if ( newValue instanceof Array ) return this.renderArray( newValue )
+        return this.renderValue ( newValue )
     }
 }
 
@@ -100,4 +110,8 @@ class Obs {
 // }
 
 export default Obs
+
+export {
+    addPorto
+}
 

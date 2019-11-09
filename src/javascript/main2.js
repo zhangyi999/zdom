@@ -24,13 +24,10 @@ setTimeout(()=>{
         $
     )
     obs.old = false
-    obs.g[1] = 123312312
-    // console.log ( 
-    //     ObjectMapFull(date, (v, k) => {
-    //         return v + 'id' + k
-    //     }, {filter:Obs}),
-    //     checkTypes(date)
-    //  )
+    obs.g.add([1233,444,2,3123,{a:'dddd'}])
+    console.log ( 
+        obs.g
+     )
 
 },2000)
 
@@ -50,7 +47,7 @@ function Index() {
                 $.num.map( v => dom.p({},v))
             ),
             dom.input({type:"checkbox", checked: $.old, '@change': cccc}),
-            $.g.map( v => dom.p({},v) )
+            $.g.map( v => dom.p({}, v.a ? v.a: v) )
         )
     )
 }
