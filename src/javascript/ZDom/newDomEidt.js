@@ -17,7 +17,7 @@ function addElemens ( p, newElement, targetElement) {
 const ArrayElement = [
     ( prant, oldRepalce, newArray ) => {
         // 从头部增加
-        const addElement = initChild(newArray);
+        const addElement = creatDocumentFragment(newArray);
         const indexEl = oldRepalce[0];
         oldRepalce.unshift( ...Array.from( addElement.childNodes ) );
         prant.insertBefore( addElement, indexEl );
@@ -25,56 +25,55 @@ const ArrayElement = [
     },
     ( prant, oldRepalce, newArray ) => {
         // 从尾部增加
-        const addElement = initChild(newArray);
+        const addElement = creatDocumentFragment(newArray);
         const newPr = oldRepalce.concat( Array.from( addElement.childNodes ));
         addElemens(prant, addElement,oldRepalce[oldRepalce.length -1] )
         return newPr
     },
-    ( prant, oldRepalce, data ) => {
+    ( prant, oldRepalce ) => {
         // 删除
-        const { index, n } = data;
-        for ( let i = index; i < index*1 + n*1; i ++ ) {
+        oldRepalce.map (  v => {
+            v.ondie?v.ondie():'';
+            v.remove();
+        })
+        return undefined;
+    },
+    ( prant, oldRepalce, newArray ) => {
+        // 替换
+        const addElement = creatDocumentFragment(newArray);
+        const oldDom = oldRepalce[0]
+        const len = oldRepalce.length
+        for ( let i = 1; i < len; i ++ ) {
             oldRepalce[i].ondie?oldRepalce[i].ondie():'';
             oldRepalce[i].remove();
         }
-        oldRepalce.splice( index, n );
-        return oldRepalce;
-    },
-    ( prant, oldRepalce, newArray, index ) => {
-        // 替换
-        const addElement = initChild(newArray);
-        const newArrayLen = newArray.length;
-        const indexDom = oldRepalce[index];
-        const childArr = Array.from( addElement.childNodes );
-        prant.replaceChild( addElement ,indexDom );
-        for( let i = index*1 + 1; i < index*1 + newArrayLen; i ++ ) {
-            const v = oldRepalce[i];
-            if( v === undefined ) break;
-            v.ondie?v.ondie():'';
-            v.remove()
-        }
-        oldRepalce.splice( index, newArrayLen, ...childArr );
+        oldRepalce = Array.from( addElement.childNodes )
+        oldDom.ondie?oldDom.ondie():''
+        prant.replaceChild(addElement, oldDom)
         return oldRepalce;
     }
 ]
 
 // domtree: 0 | 从头部增加，1 | 从尾部增加， 2 | 删除，3 | 替换  
-function replaceDom( type, prant, oldDom, newRender ) {
-    const newDom = newRender()
+function replaceDom( type, prant, oldDom, Obs ) {
+    const newDom = Obs.render()
+    return ArrayElement[type]( prant, oldDom, newDom )
 }
 
 
 
 function addObsDom( prant, Obs ) {
-    const {render,renders} = Obs
-    let oldDom = addChild ( prant, render() )
+    const {renders} = Obs
+    const fragment =  creatDocumentFragment ( Obs.render() )
+    let oldDom = Array.from( fragment.childNodes )
+    prant.appendChild( fragment )
     Obs.domtree.push((type) => {
-        Obs.renders = renders
-        oldDom = replaceDom( type, prant, oldDom, render )
-        Obs.renders = []
+        Obs.renders.push(...renders)
+        oldDom = replaceDom( type, prant, oldDom, Obs )
+        Obs.renders.length = 0
     })
     // 初始化
-    Obs.renders = []
+    Obs.renders.length = 0
 }
 
 function creatDocumentFragment(childs) {
