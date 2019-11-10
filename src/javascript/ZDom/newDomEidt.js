@@ -60,7 +60,9 @@ const ArrayElement = [
 
 // domtree: 0 | 从头部增加，1 | 从尾部增加， 2 | 删除，3 | 替换  
 function replaceDom( type, prant, oldDom, obs, newValue ) {
+    console.log ( newValue,'newValuenewValuenewValue' )
     const newDom = obs.render( newValue )
+     console.log ( newDom, newValue,'newValuenewValuenewValue' )
     return ArrayElement[type]( prant, oldDom, newDom, newValue )
 }
 

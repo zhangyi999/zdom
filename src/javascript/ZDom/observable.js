@@ -12,12 +12,17 @@ function Observable( obj, key, obsDomObj, value ) {
         set(newVal) {
             if ( newVal instanceof Array ) {
                 const dataObje = [], domObjs = [];
-                newVal.map( (v,k)=>{
-                    bindObs( domObjs, dataObje, k, v )
-                })
                 old.length = 0
-                old.push( ... dataObje )
+                obsDomObj instanceof Obs?obsDomObj.get[key].length = 0:obsDomObj[key].length = 0
+                newVal.map( (v,k)=>{
+                    bindObs( domObjs, old, k, v )
+                })
+                
+                console.log(old,domObjs,obsDomObj)
+                // old.push( ... dataObje )
                 newVal = domObjs
+                
+                // return
             } 
             else if ( newVal instanceof Object ) {
                 const dataObje = {}, domObjs = {};
@@ -38,11 +43,18 @@ function bindObs( obsDomObj, obsDataObj, key, value ) {
         obsDomObj[key] = new Obs([])
         Observable( obsDataObj, key, obsDomObj , [] )
         addPorto(obsDataObj[key], 'add', newArr => {
+            const dataObje = [], domObjs = [];
             const len = obsDataObj[key].length
-            obsDomObj[key].push(newArr)
             newArr.map( (v,i) => {
-                bindObs( obsDomObj[key], obsDataObj[key], len + i  , v )
+                // console.log ( v,i, 'obsDataObj[key]' )
+                // bindObs( obsDomObj[key], obsDataObj[key], len + i  , v )
+                bindObs( domObjs, dataObje, len + i  , v )
+                obsDataObj[key].push(dataObje[len + i])
             })
+            // console.log ( dataObje.splice(len ,len + newArr.length ) , 'obsDataObj[key]' )
+            // obsDataObj[key].push( ...dataObje.splice(len ,len + newArr.length ) )
+            // console.log ( obsDataObj[key], obsDomObj[key], domObjs, 'obsDataObj[key]' )
+            obsDomObj[key].push(domObjs)
         })
         value.map( (v,i) => {
             bindObs( obsDomObj[key], obsDataObj[key], i, v )
