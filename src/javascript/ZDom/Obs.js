@@ -27,11 +27,11 @@ function isDiff( oldData, newData ) {
     if ( oldData != newData ) return true
 }
 
-function addPorto(obj, key, val) {
+function addPorto(obj, key, val, {enumerable, configurable, writable} = {}) {
     Object.defineProperty(obj, key, {
-        enumerable: false,
-        configurable: false,
-        writable: false,
+        enumerable: enumerable || false,
+        configurable: configurable || false,
+        writable: writable || false,
         value: val
     })
 }
@@ -49,16 +49,15 @@ class Obs {
         addPorto(this, 'watch', [])
         addPorto(this, 'renders', [])
         addPorto(this, 'initValue', valueAny)
-        this.get = valueAny
-        this.set = ( newValue ) => {
+        addPorto(this, '__get', valueAny,{writable:true})
+        addPorto(this, '__set', ( newValue ) => {
             if ( newValue === null ) return this.rmove()
             if ( isDiff( newValue, this.get ) === false ) return
             this.get = newValue
             this.domtree.map( v => v(3, newValue) );
             this.attrtree.map( v => v() );
             this.watch.map( v => v(newValue) );
-        }
-
+        })
     }
 
     push( newValue ) {

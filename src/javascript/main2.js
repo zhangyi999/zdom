@@ -1,24 +1,24 @@
 
 import dom from './ZDom/newDomEidt'
 
-import observable from './ZDom/observable'
+// import observable from './ZDom/observable'
 
 import Obs from './ZDom/Obs'
 
-function Observable( obj, key, callback ) {
-    let old = value
-    Object.defineProperty(obj, key, {
-        enumerable: true, // 可枚举
-        configurable: true, // fales 不能再define
-        get() {
-            return callback( key )
-        },
-        set(newVal) {
-            callback
-        }
-    });
-    return obj
-} 
+// function Observable( obj, key, callback ) {
+//     let old = value
+//     Object.defineProperty(obj, key, {
+//         enumerable: true, // 可枚举
+//         configurable: true, // fales 不能再define
+//         get() {
+//             return callback( key )
+//         },
+//         set(newVal) {
+//             callback
+//         }
+//     });
+//     return obj
+// } 
 
 // function proessArr ( arr ) {
 //     const newArr = []
@@ -47,24 +47,24 @@ function Observable( obj, key, callback ) {
 
 // return
 
-const [ $, obs ] = observable( {
-    // num: 1,
-    // b:{
-    //     a:2
-    // },
-    g: [
-        ['sdf','qweewq'],
-        ['sdfdsf','qweesdfwq']
-        // {a:'123231'}
-    ],
-    // old: true
-} )
+// const [ $, obs ] = observable( {
+//     // num: 1,
+//     // b:{
+//     //     a:2
+//     // },
+//     g: [
+//         ['sdf','qweewq'],
+//         ['sdfdsf','qweesdfwq']
+//         // {a:'123231'}
+//     ],
+//     // old: true
+// } )
 
-console.log (
-    $.g,
-    obs,
-    '$$$$$$$$$$$$$$$$$$$'
-)
+// console.log (
+//     $.g,
+//     obs,
+//     '$$$$$$$$$$$$$$$$$$$'
+// )
   
 const data = new Obs([
     new Obs({
@@ -87,7 +87,7 @@ setTimeout(()=>{
 
                 // obs.g[0] = {a:'123-----213'}
                 // obs.g = ([{a:'dddd'},{a:'dddd'}])
-                console.log(obs.g , $.g, 'sdf$.g')
+                // console.log(obs.g , $.g, 'sdf$.g')
 //     // console.log( Object.keys(date) )
 //     // date.get.a.set(dom.b({},'321312'))
 //     // date.get.b.set('ggg')
@@ -135,10 +135,10 @@ setTimeout(()=>{
 
 },1000)
 
-function cccc( {checked} = {}) {
-    obs.old = checked
-    console.log( obs.old )
-}
+// function cccc( {checked} = {}) {
+//     obs.old = checked
+//     console.log( obs.old )
+// }
 
 function Index() {
     // console.log (  $.b.a )
@@ -151,10 +151,10 @@ function Index() {
             //     $.num.map( v => dom.p({},v))
             // ),
             // dom.input({type:"checkbox", checked: $.old, '@change': cccc}),
-            $.g.map( v => {
-                console.log(v,'vvvv' )
-                return dom.p({}, v.map( v => dom.b({},v)))
-            }),
+            // $.g.map( v => {
+            //     console.log(v,'vvvv' )
+            //     return dom.p({}, v.map( v => dom.b({},v)))
+            // }),
             data.map( v => {
                 console.log ( v,'vvv' )
                 return dom.p({}, v.a || v )
