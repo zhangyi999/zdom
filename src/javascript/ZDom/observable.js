@@ -31,7 +31,6 @@ function bindObs( obsDomObj, obsDataObj, key, value ) {
     if ( value instanceof Array ) {
         obsDomObj[key] = new Obs([])
         Observable( obsDataObj, key, obsDomObj , [] )
-        // obsDataObj[key] = []
         addPorto(obsDataObj[key], 'add', newArr => {
             const len = obsDataObj[key].length
             obsDomObj[key].push(newArr)
@@ -46,6 +45,7 @@ function bindObs( obsDomObj, obsDataObj, key, value ) {
     }
 
     if ( value instanceof Object ) {
+
         if ( obsDomObj instanceof Obs ) {
             obsDomObj.get[key] = new Obs({})
         } else {
@@ -57,19 +57,9 @@ function bindObs( obsDomObj, obsDataObj, key, value ) {
         })
         return
     }
-    if ( obsDomObj.get instanceof Array ) {
-        obsDomObj.get.push( new Obs(value) )
-        Observable( obsDataObj, key, obsDomObj.get , value )
-    }
-    else if ( obsDomObj.get instanceof Object ) {
-        obsDomObj.get[key] =  new Obs(value)
-        Observable( obsDataObj, key, obsDomObj.get , value )
-    }
-    else {
-        obsDomObj[key] = new Obs(value)
-        Observable( obsDataObj, key, obsDomObj , value )
-    }
-    
+
+    obsDomObj instanceof Obs ? obsDomObj.get[key] = new Obs(value) : obsDomObj[key] = new Obs(value)
+    Observable( obsDataObj, key, obsDomObj , value )    
 }
 
 /**

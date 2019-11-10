@@ -12,12 +12,16 @@ const [ $, obs ] = observable( {
     // },
     g: [
         {a:'123'},
-        // {a:'123231'}
+        {a:'123231'}
     ],
     // old: true
 } )
 
-
+console.log (
+    $.g,
+    obs,
+    '$$$$$$$$$$$$$$$$$$$'
+)
   
 const data = new Obs([
     new Obs({
@@ -30,13 +34,14 @@ const data = new Obs([
 // })
 
 
-console.log (
-        $.g,
-        'sdffffffff',
-        data
-    )
+// console.log (
+//         $.g,
+//         'sdffffffff',
+//         data
+//     )
 
 setTimeout(()=>{
+    obs.g.add([{a:'dddd'}])
     // console.log( Object.keys(date) )
     // date.get.a.set(dom.b({},'321312'))
     // date.get.b.set('ggg')
@@ -45,32 +50,32 @@ setTimeout(()=>{
     //     $
     // )
     // obs.old = false
-    // obs.g.add([1233,444,2,3123,{a:'dddd'}])
+    
     // obs.g = ['ff','ggg', 'jjshsh']
-    // obs.g.add(['0000','sdf'])
-     console.log ( 
-            data.get[0],'sdffffff-----'
-        )
-    // data.get[0].get.a.set('fsdsdfsdf')
-    // data.get[1].set( '00001' )
+//     // obs.g.add(['0000','sdf'])
+//      console.log ( 
+//             data.get[0],'sdffffff-----'
+//         )
+//     // data.get[0].get.a.set('fsdsdfsdf')
+//     // data.get[1].set( '00001' )
 
-        data.get[0].set({a:new Obs('fdfffff')})
-    setTimeout(()=>{
+//         data.get[0].set({a:new Obs('fdfffff')})
+//     setTimeout(()=>{
 
-// data.get[0].get.a.set(1233213)
-       console.log ( 
-            data,'sdffffff-----'
-        )
-        // console.log ( data.get[0].get )
-        data.get[0].get.a.set('fsdf')
-        // setTimeout(()=>{
-        //     console.log ( 
-        //         obs.g[0] = '123213'
-        //     )
-        // },2000)
-    },4000)
+// // data.get[0].get.a.set(1233213)
+//        console.log ( 
+//             data,'sdffffff-----'
+//         )
+//         // console.log ( data.get[0].get )
+//         data.get[0].get.a.set('fsdf')
+//         // setTimeout(()=>{
+//         //     console.log ( 
+//         //         obs.g[0] = '123213'
+//         //     )
+//         // },2000)
+//     },4000)
 
-},0)
+},1000)
 
 function cccc( {checked} = {}) {
     obs.old = checked
@@ -88,14 +93,14 @@ function Index() {
             //     $.num.map( v => dom.p({},v))
             // ),
             // dom.input({type:"checkbox", checked: $.old, '@change': cccc}),
-            // $.g.map( v => {
-            //     console.log(v,'vvvv' )
-            //     return dom.p({}, v.a)
-            // }),
-            data.map( v => {
-                console.log ( v,'vvv' )
-                return dom.p({}, v.a || v )
-            })
+            $.g.map( v => {
+                console.log(v,'vvvv' )
+                return dom.p({}, v.a)
+            }),
+            // data.map( v => {
+            //     console.log ( v,'vvv' )
+            //     return dom.p({}, v.a || v )
+            // })
         )
     )
 }
