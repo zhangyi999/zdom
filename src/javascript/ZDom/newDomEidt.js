@@ -53,7 +53,8 @@ const ArrayElement = [
         }
         oldRepalce = Array.from( addElement.childNodes )
         oldDom.ondie?oldDom.ondie():''
-        prant.replaceChild(addElement, oldDom)
+        // prant.replaceChild(addElement, oldDom)
+        oldDom.replaceWith(addElement)
         return oldRepalce;
     }
 ]

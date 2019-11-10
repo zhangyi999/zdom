@@ -1,6 +1,5 @@
-import dom from './domEidt'
-
-import Commponent, { Observable } from './commponent'
+import Obs from './Obs'
+import dom from './newDomEidt'
 
 import {ObjectMap} from './public'
 
@@ -19,8 +18,7 @@ function getPageData() {
 export default dom
 
 export {
-    Commponent,
-    Observable,
+    Obs,
     ObjectMap,
     getPageData
 }
