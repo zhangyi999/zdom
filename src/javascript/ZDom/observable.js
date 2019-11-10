@@ -8,20 +8,26 @@ function Observable( obj, key, obsDomObj, value ) {
         configurable: true, // fales 不能再define
         get() {
             return old
-        }, 
+        },
         set(newVal) {
-            old = newVal
-            console.log(obsDomObj, key, newVal, 'newVal' )
-            // if( obsDomObj instanceof Obs ) {
-            //     console.log ( obsDomObj.get[key] )
-            //     obsDomObj.get[key].set( newVal )
-            // } else {
-            //     obsDomObj[key].set( newVal )
-            // }
-            
-            // bindObs( obsDomObj, obj, key, newVal )
-
-            obsDomObj.get[key].set( newVal )
+            if ( newVal instanceof Array ) {
+                const dataObje = [], domObjs = [];
+                newVal.map( (v,k)=>{
+                    bindObs( domObjs, dataObje, k, v )
+                })
+                old.length = 0
+                old.push( ... dataObje )
+                newVal = domObjs
+            } 
+            else if ( newVal instanceof Object ) {
+                const dataObje = {}, domObjs = {};
+                ObjectMap(newVal, (v,k)=>{
+                    bindObs( domObjs, dataObje, k, v )
+                })
+                old = dataObje
+                newVal = domObjs
+            }  else old = newVal
+            obsDomObj instanceof Obs?obsDomObj.get[key].set( newVal ):obsDomObj[key].set( newVal )
         }
     });
     return obj

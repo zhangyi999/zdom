@@ -41,7 +41,9 @@ const data = new Obs([
 //     )
 
 setTimeout(()=>{
-    obs.g.add([{a:'dddd'}])
+
+                // obs.g[0] = {a:'123-----213'}
+                obs.g = ([{a:'dddd'},{a:'dddd'}])
     // console.log( Object.keys(date) )
     // date.get.a.set(dom.b({},'321312'))
     // date.get.b.set('ggg')
@@ -68,11 +70,18 @@ setTimeout(()=>{
 //         )
 //         // console.log ( data.get[0].get )
 //         data.get[0].get.a.set('fsdf')
-//         // setTimeout(()=>{
-//         //     console.log ( 
-//         //         obs.g[0] = '123213'
-//         //     )
-//         // },2000)
+        setTimeout(()=>{
+            obs.g = ([{a:'dddd'},{a:'dddd'}])
+        //     // console.log ( 
+        //     //     // obs.g[0].a = '123--11---213'
+        //     // )
+            setTimeout(()=>{
+                console.log ( 
+                // obs.g[0]
+                obs.g[0].a = '123--11---213'
+            )
+            },1000)
+        },2000)
 //     },4000)
 
 },1000)
