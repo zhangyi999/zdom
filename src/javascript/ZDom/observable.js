@@ -38,46 +38,41 @@ function Observable( obj, key, obsDomObj, value ) {
     return obj
 } 
 
-function bindObs( obsDomObj, obsDataObj, key, value ) {
+function bindObs( obsDomObj, key, value ) {
     if ( value instanceof Array ) {
-        obsDomObj[key] = new Obs([])
-        Observable( obsDataObj, key, obsDomObj , [] )
-        addPorto(obsDataObj[key], 'add', newArr => {
-            const dataObje = [], domObjs = [];
-            const len = obsDataObj[key].length
-            newArr.map( (v,i) => {
-                // console.log ( v,i, 'obsDataObj[key]' )
-                // bindObs( obsDomObj[key], obsDataObj[key], len + i  , v )
-                bindObs( domObjs, dataObje, len + i  , v )
-                obsDataObj[key].push(dataObje[len + i])
-            })
-            // console.log ( dataObje.splice(len ,len + newArr.length ) , 'obsDataObj[key]' )
-            // obsDataObj[key].push( ...dataObje.splice(len ,len + newArr.length ) )
-            // console.log ( obsDataObj[key], obsDomObj[key], domObjs, 'obsDataObj[key]' )
-            obsDomObj[key].push(domObjs)
-        })
+        obsDomObj[key] = new Obs(value)
+        // Observable( obsDataObj, key, obsDomObj , [] )
+        // addPorto(obsDataObj[key], 'add', newArr => {
+        //     const dataObje = [], domObjs = [];
+        //     const len = obsDataObj[key].length
+        //     newArr.map( (v,i) => {
+        //         // console.log ( v,i, 'obsDataObj[key]' )
+        //         // bindObs( obsDomObj[key], obsDataObj[key], len + i  , v )
+        //         bindObs( domObjs, dataObje, len + i  , v )
+        //         obsDataObj[key].push(dataObje[len + i])
+        //     })
+        //     // console.log ( dataObje.splice(len ,len + newArr.length ) , 'obsDataObj[key]' )
+        //     // obsDataObj[key].push( ...dataObje.splice(len ,len + newArr.length ) )
+        //     // console.log ( obsDataObj[key], obsDomObj[key], domObjs, 'obsDataObj[key]' )
+        //     obsDomObj[key].push(domObjs)
+        // })
         value.map( (v,i) => {
-            bindObs( obsDomObj[key], obsDataObj[key], i, v )
+            bindObs( obsDomObj[key], i, v )
         })
         return
     }
 
     if ( value instanceof Object ) {
-
-        if ( obsDomObj instanceof Obs ) {
-            obsDomObj.get[key] = new Obs({})
-        } else {
-            obsDomObj[key] = new Obs({})
-        }
-        Observable( obsDataObj, key, obsDomObj , {} )
+        obsDomObj[key] = new Obs(value)
+        // Observable( obsDataObj, key, obsDomObj , value )
         ObjectMap( value,  (v,i) => {
-            bindObs( obsDomObj instanceof Obs?obsDomObj.get[key]:obsDomObj[key], obsDataObj[key], i, v )
+            bindObs( obsDomObj[key], i, v )
         })
         return
     }
 
-    obsDomObj instanceof Obs ? obsDomObj.get[key] = new Obs(value) : obsDomObj[key] = new Obs(value)
-    Observable( obsDataObj, key, obsDomObj , value )    
+    obsDomObj[key] = new Obs(value)
+    // Observable( obsDataObj, key, obsDomObj , value )    
 }
 
 /**
@@ -94,9 +89,9 @@ new Obs([
 */
 
 function initDataObs( Obj ) {
-    const obsDom = {}, obsData = {};
-    ObjectMap(Obj, (v,k)=>{
-        bindObs( obsDom, obsData, k, v )
+    const obsDom = new Obs(Obj), obsData = {};
+    ObjectMap(obsDom.__get, (v,k)=>{
+        bindObs( obsDom, k, v )
     })
     return [ obsDom, obsData ]
 }

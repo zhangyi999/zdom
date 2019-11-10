@@ -1,7 +1,7 @@
 
 import dom from './ZDom/newDomEidt'
 
-// import observable from './ZDom/observable'
+import observable from './ZDom/observable'
 
 import Obs from './ZDom/Obs'
 
@@ -47,31 +47,55 @@ import Obs from './ZDom/Obs'
 
 // return
 
-// const [ $, obs ] = observable( {
+// const [$,dd] = observable( {
 //     // num: 1,
 //     // b:{
 //     //     a:2
 //     // },
 //     g: [
-//         ['sdf','qweewq'],
-//         ['sdfdsf','qweesdfwq']
-//         // {a:'123231'}
+//         // ['sdf','qweewq'],
+//         // ['sdfdsf','qweesdfwq']
+//         {a:'123231'}
 //     ],
 //     // old: true
 // } )
 
 // console.log (
-//     $.g,
-//     obs,
+//     window.$$ = $,
+//     dd,
 //     '$$$$$$$$$$$$$$$$$$$'
 // )
   
 const data = new Obs([
-    new Obs({
-        a:new Obs(23)
-    })
-])
-console.log ( data, 'dafasasd' )
+    // {a:12321},
+    // {a:1234421},
+    // {a:1212321},
+    // {a:1230021},
+    true,
+    false
+]
+    
+//     {
+//     // num: 1,
+//     // b:{
+//     //     a:2
+//     // },
+//     // g: [
+//     //     // ['sdf','qweewq'],
+//     //     // ['sdfdsf','qweesdfwq']
+//     //     {a:'123231'}
+//     // ],
+//     // old: true
+    
+// }
+)
+
+console.log (  window.$$ = data )
+window.dom = dom
+// function initObs( any ) {
+//     const data = 
+// }
+// console.log ( data, 'dafasasd' )
 // const data = new Obs({
 //     a:new Obs(23)
 // })
@@ -144,6 +168,10 @@ function Index() {
     // console.log (  $.b.a )
     return (
         dom.div({},
+            data.map( v => {
+                console.log ( v , 'vvvv')
+               return dom.p({}, v) 
+            })
             // dom.h2({},$.b.a),
             // // dom.h2({},date.map( v => dom.p({class: ['jj-',v.b]},v.a))),
             // dom.h1({class: ['show-', $.old] }, 
@@ -155,10 +183,7 @@ function Index() {
             //     console.log(v,'vvvv' )
             //     return dom.p({}, v.map( v => dom.b({},v)))
             // }),
-            data.map( v => {
-                console.log ( v,'vvv' )
-                return dom.p({}, v.a || v )
-            })
+            
         )
     )
 }

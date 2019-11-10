@@ -42,10 +42,10 @@ const ArrayElement = [
     },
     ( prant, oldRepalce, newArray ) => {
         // 替换
-        
+        // console.log ( [oldRepalce], newArray, 'newArraynewArraynewArray' )
         const addElement = creatDocumentFragment(newArray);
         const oldDom = oldRepalce[0]
-        prant = oldDom.parentElement
+        prant = oldDom.parentElement || prant
         const len = oldRepalce.length
         for ( let i = 1; i < len; i ++ ) {
             oldRepalce[i].ondie?oldRepalce[i].ondie():'';
@@ -60,9 +60,9 @@ const ArrayElement = [
 
 // domtree: 0 | 从头部增加，1 | 从尾部增加， 2 | 删除，3 | 替换  
 function replaceDom( type, prant, oldDom, obs, newValue ) {
-    console.log ( newValue,'newValuenewValuenewValue' )
+    // console.log (obs, newValue,'newValuenewValuenewValue' )
     const newDom = obs.render( newValue )
-     console.log ( newDom, newValue,'newValuenewValuenewValue' )
+    //  console.log ( newDom, newValue,'newValuenewValuenewValue' )
     return ArrayElement[type]( prant, oldDom, newDom, newValue )
 }
 
@@ -72,24 +72,27 @@ function addObsDom( prant, obs ) {
     // 仅考虑单层数组，对象 直接渲染，不用遍历
     const fragment = document.createDocumentFragment()
     const renders = [...obs.renders]
-    if ( obs.get instanceof Array ) {
-        obs.get.map((v,k) => {
+
+    if ( obs.__get instanceof Array ) {
+        obs.__get.map((v,k) => {
             // 数组子元素继承 数组的 渲染 模式
-            if ( v instanceof Obs ){
-                v.renders.push(...renders)
-            }            
-            addChild ( fragment, v )
+            // if ( v instanceof Obs ){
+                obs[k].renders.push(...renders)
+            // }            
+            addChild ( fragment, obs[k] )
         })
     } else {
         addChild ( fragment, obs.render() )
     }
+    // const ddf = obs.render()
+    // addChild ( fragment, ddf )
     
     let oldDom = Array.from( fragment.childNodes )
     prant.appendChild( fragment )
     obs.domtree.push((type, newValue) => {
         obs.renders.push(...renders)
         // bug 老节点
-        console.log ( obs, newValue, ' obsobsobs' )
+        // console.log ( obs, newValue, ' obsobsobs' )
         oldDom = replaceDom( type, prant, oldDom, obs, newValue )
         obs.renders.length = 0
     })
@@ -167,9 +170,9 @@ function mapAttr( dom, arr ) {
 
         if ( value instanceof Obs ) {
             value.attrtree.push( function ( ) {
-                setAttribute(dom, key, value.get )
+                setAttribute(dom, key, value.__get )
             })
-            return setAttribute(dom, key, value.get );
+            return setAttribute(dom, key, value.__get );
         }
 
         if ( value instanceof Array ) {
