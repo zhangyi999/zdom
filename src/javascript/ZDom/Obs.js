@@ -51,6 +51,7 @@ class Obs {
         addPorto(this, 'initValue', valueAny)
         this.get = valueAny
         this.set = ( newValue ) => {
+            // if ( newValue === null ) return rmove()
             if ( isDiff( newValue, this.get ) === false ) return
             this.get = newValue
             this.domtree.map( v => v(3) );
