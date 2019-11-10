@@ -51,10 +51,10 @@ class Obs {
         addPorto(this, 'initValue', valueAny)
         this.get = valueAny
         this.set = ( newValue ) => {
-            // if ( newValue === null ) return rmove()
+            if ( newValue === null ) return this.rmove()
             if ( isDiff( newValue, this.get ) === false ) return
             this.get = newValue
-            this.domtree.map( v => v(3) );
+            this.domtree.map( v => v(3, newValue) );
             this.attrtree.map( v => v() );
             this.watch.map( v => v(newValue) );
         }
@@ -81,7 +81,7 @@ class Obs {
     renderValue ( v, i ) {
         let prvValue = v;
         this.renders.map( fn => {
-            prvValue = fn( prvValue, i )
+            prvValue = fn( v instanceof Obs ? prvValue.get: prvValue, i )
         })
         return prvValue
     }

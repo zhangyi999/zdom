@@ -72,6 +72,19 @@ function bindObs( obsDomObj, obsDataObj, key, value ) {
     
 }
 
+/**
+g: [
+        {a:'123'},
+        // {a:'123231'}
+    ],
+
+new Obs([
+    new Obs({
+        a:new Obs(23)
+    })
+]) 
+*/
+
 function initDataObs( Obj ) {
     const obsDom = {}, obsData = {};
     ObjectMap(Obj, (v,k)=>{
