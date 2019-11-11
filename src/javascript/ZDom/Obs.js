@@ -96,10 +96,22 @@ class Obs {
                 delete this[v]
                 delete this.data
             })
+            const domtree = [...this.domtree]
+            const attrtree = [...this.attrtree]
+            const watch = [...this.watch]
+            this.domtree.length = 0
+            this.attrtree.length = 0
+            this.watch.length = 0
+            // this.domtree.length = 0
+
             this.init( newValue )
-            this.domtree.map( v => v(3, this) );
-            this.attrtree.map( v => v());
-            this.watch.map( v => v(newValue) );
+
+            domtree.map( v => v(3, this) );
+            attrtree.map( v => v());
+            watch.map( v => v(newValue) );
+            this.domtree.push(...domtree)
+            this.attrtree.push(...attrtree)
+            this.watch.push(...watch)
         })
         this.init( valueAny )
     }
@@ -113,6 +125,7 @@ class Obs {
                 return this.__get
             },
             set(newVal) {
+                // console.log ( this, newVal )
                 this.__set(newVal)
             }
         });
@@ -129,6 +142,7 @@ class Obs {
     }
 
     push( newValue ) {
+        console.log ( this, 'push push' )
         if (!( newValue instanceof Array ) ) throw 'push argument need array'
         const len = Object.keys(this).length
         const valueLen = newValue.length
@@ -167,9 +181,10 @@ class Obs {
     }
 
     render( newValue = this.__get ) {
-        if ( this.renders.length === 0 ) return newValue
+        console.log ( newValue )
+        // if ( this.renders.length === 0 ) return newValue
         if ( newValue instanceof Obs ) {
-            if ( typeof newValue.__get !== 'object' ) return [this.renderValue ( newValue.__get, 0 )]
+            if ( typeof newValue.__get !== 'object' ) return [this.renderValue ( newValue, 0 )]
             if ( newValue.__get instanceof Element || newValue.__get instanceof Text || newValue.__get instanceof DocumentFragment ) return [this.renderValue ( newValue.__get, 0 )] 
             const data = []
             ObjectMap( newValue, ( v, k ) => {
