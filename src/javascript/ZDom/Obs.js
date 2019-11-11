@@ -109,6 +109,8 @@ class Obs {
             domtree.map( v => v(3, this) );
             attrtree.map( v => v());
             watch.map( v => v(newValue) );
+            // 非对象类型重置时会重新渲染，push domtree
+            if ( !( newValue instanceof Object) ) return
             this.domtree.push(...domtree)
             this.attrtree.push(...attrtree)
             this.watch.push(...watch)
