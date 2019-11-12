@@ -7,7 +7,7 @@ import dom,{Obs} from './ZDom'
  */ 
 let i = 0
 function addList( ) {
-    this.list.push([22,{a:1}])
+    this.list.push([{a:1}])
     console.log  ( this )
 }
 
@@ -21,8 +21,9 @@ function chengeArr4(){
     // this.list[6].__set({a:('sdffff')}) // 
     // this.data.list[6].a = (dom.b({},'this is 4'))
     // this.data.deepLisst[0] = ({a:{b:'33333'}})
-    this.data.list[0].a = !this.data.list[0].a
-    console.log ( this.data.list[0].a )
+
+    console.log ( this.data.list )
+    this.data.list[3].a = !this.data.list[3].a
     console.log(
         this.list[0]
     )

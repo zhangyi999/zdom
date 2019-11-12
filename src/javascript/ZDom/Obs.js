@@ -130,11 +130,7 @@ class Obs {
                 this.__set(newVal)
             }
         });
-        if ( valueAny instanceof Array ) {
-            this.__get.map((v,k)=>{
-                bindObs( this, this.data, k, v )
-            })
-        } else if ( valueAny instanceof Object ) {
+        if ( valueAny instanceof Object ) {
             ObjectMap(this.__get, (v,k)=>{
                 bindObs( this, this.data, k, v )
             })
@@ -177,7 +173,7 @@ class Obs {
         const valueLen = newValue.length
         const nV = {}
         for ( let i = 0; i < valueLen; i++ ) {
-            nV[i + len] = this[i + len]
+            nV[i + len] = newValue[i]
         }
         this.add ( nV )
     }
