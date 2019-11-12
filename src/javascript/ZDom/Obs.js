@@ -1,6 +1,12 @@
 import checkTypes from './types'
 import { ObjectMap } from './public'
 
+
+console.log(
+checkTypes(true),
+checkTypes(1),
+checkTypes('1')
+)
 function Observable( obj, key, obs ) {
     Object.defineProperty(obj, key, {
         enumerable: true, // 可枚举
@@ -16,32 +22,22 @@ function Observable( obj, key, obs ) {
 }
 
 // return ture is diff status
-function isDiff( oldData, newData ) {
-    if ( oldData == newData ) return false
-    let diff = false
-    if ( checkTypes(oldData) === 'Array' &&  checkTypes(newData) === 'Array' ) {
-        const olen = oldData.length
-        const nlen = newData.length
-        if ( olen !== nlen ) return true
-        for ( let i = 0; i < olen; i++ ) {
-            if ( isDiff( oldData[i], newData[i] ) === true ) {
-                diff = true
-                break; 
-            }
-        }
-        return diff
+function isDiff( newData, oldObs ) {
+    const oldData = oldObs.__get
+    if ( newData == oldData ) return false
+    if ( 
+        checkTypes(newData) === 'Boolean' ||
+        checkTypes(newData) === 'Number' ||
+        checkTypes(newData) === 'String'
+    ) {
+        Object.keys(oldObs).map ( v => {
+            delete oldObs[v]
+            delete oldObs.data[v]
+        })
+        oldObs.replace( newData )
+        return false
     }
-    if ( checkTypes(oldData) === 'Object' &&  checkTypes(newData) === 'Object' ) { 
-        for ( let i in  oldData ) {
-            if ( isDiff( oldData[i], newData[i] ) === true ) {
-                diff = true
-                break; 
-            }
-        }
-        return diff
-    }
-    if ( oldData != newData ) return true
-}
+} 
 
 function addPorto(obj, key, val, {enumerable, configurable, writable} = {}) {
     Object.defineProperty(obj, key, {
@@ -90,29 +86,30 @@ class Obs {
         addPorto(this, '__set', ( newValue ) => {
             
             // if ( newValue === null ) return this.rmove()
-            if ( isDiff( newValue, this.__get ) === false ) return
+            if ( isDiff( newValue, this ) === false ) return
             
-            Object.keys(this).map ( v => {
-                delete this[v]
-                delete this.data
-            })
-            const domtree = [...this.domtree]
-            const attrtree = [...this.attrtree]
-            const watch = [...this.watch]
-            this.domtree.length = 0
-            // this.attrtree.length = 0
-            this.watch.length = 0
+            // Object.keys(this).map ( v => {
+            //     delete this[v]
+            // })
+
+            // delete this.data
+            // const domtree = [...this.domtree]
+            // const attrtree = [...this.attrtree]
+            // const watch = [...this.watch]
             // this.domtree.length = 0
+            // // this.attrtree.length = 0
+            // this.watch.length = 0
+            // // this.domtree.length = 0
 
-            this.init( newValue )
+            // this.init( newValue )
 
-            domtree.map( v => v(3, this) );
-            attrtree.map( v => v());
-            watch.map( v => v(newValue) );
-            // 非对象类型重置时会重新渲染，push domtree
-            if ( !( newValue instanceof Object) ) return
-            this.domtree.push(...domtree)
-            this.watch.push(...watch)
+            // domtree.map( v => v(3, this) );
+            // attrtree.map( v => v());
+            // watch.map( v => v(newValue) );
+            // // 非对象类型重置时会重新渲染，push domtree
+            // if ( !( newValue instanceof Object) ) return
+            // this.domtree.push(...domtree)
+            // this.watch.push(...watch)
         })
         this.init( valueAny )
     }
@@ -154,7 +151,7 @@ class Obs {
         // 非对象类型重置时会重新渲染，push domtree
         // if ( !( newValue instanceof Object) ) return
         // this.domtree.push(...domtree)
-        this.watch.push(...watch)
+        // this.watch.push(...watch)
     }
 
     add ( newObject ) {
@@ -183,6 +180,9 @@ class Obs {
     }
 
     rmove() {
+        Object.keys(this).map ( v => {
+            delete this[v]
+        })
         this.__get = undefined
         this.domtree.map( v => v( 2 ) )
     }

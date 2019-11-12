@@ -12,8 +12,8 @@ function addList( ) {
 }
 
 function reloadeArr(){
-    this.date.replace(i++)
-    this.data.list = [{a:1}]
+    this.data.date  = (i++)
+    this.data.list =' [{a:1}]'
 }
  
 function chengeArr4(){
