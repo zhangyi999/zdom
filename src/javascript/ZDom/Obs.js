@@ -142,6 +142,11 @@ class Obs {
         
     }
 
+    replace ( newOnObject ) {
+        this.__get = newOnObject
+        this.domtree.map( v => v(3, this) )
+    }
+
     push( newValue ) {
         // console.log ( this, 'push push' )
         if (!( newValue instanceof Array ) ) throw 'push argument need array'
