@@ -12,8 +12,8 @@ function addList( ) {
 }
 
 function reloadeArr(){
-    this.data.date  = dom.p({},(i++))
-    // this.data.list =' [{a:1}]'
+    // this.data.date  = [123]
+    this.data.list = [{a:i++}]
 }
  
 function chengeArr4(){
@@ -23,7 +23,7 @@ function chengeArr4(){
     // this.data.deepLisst[0] = ({a:{b:'33333'}})
 
     console.log ( this.data.list )
-    this.data.list[3].a = !this.data.list[3].a
+    this.data.list[0].a = !this.data.list[0].a
     console.log(
         this.list[0]
     )
@@ -66,7 +66,6 @@ function Index() {
                 // dom.h4({},'list'),
                 dom.p({}, $.list[0].a ),
                 dom.p({}, $.list.map( v => {
-                    console.log ( v, 'vvvvv' )
                     return dom.input({type: 'checkbox',checked:v.a || v, class: v.a || v }) 
                 }) )
             ),

@@ -22,9 +22,45 @@ function Observable( obj, key, obs ) {
 }
 
 // return ture is diff status
+
 function isDiff( newData, oldObs ) {
     const oldData = oldObs.__get
+    console.log ( newData, oldData, checkTypes(newData) , checkTypes(oldData) )
+    if ( 
+        ( newData instanceof Object || oldData instanceof Object ) &&
+        checkTypes(newData) !== checkTypes(oldData)  
+    ) throw '值为对象时，不可改变值得类型'
     if ( newData == oldData ) return false
+    if ( newData instanceof Object ) {
+        const newValueArr = {}
+        ObjectMap( newData, (v,k) => {
+            if ( oldData[k] === undefined ) {
+                newValueArr[k] = v
+            } else {
+                // 0.3 只考虑 [{}] 一层状态，哈哈，能力有限，请见谅
+                if ( v instanceof Object ) {
+                    ObjectMap( v, (v, k1) => {
+                        isDiff( v, oldObs[k][k1] )
+                    })
+                } else {
+                    isDiff( v, oldObs[k] )
+                }
+            }
+        })
+        ObjectMap( oldData, (v,k) => {
+            if ( newData[k] === undefined ) {
+                Object.keys(oldObs[k]).map ( v => {
+                    oldObs[k][v].remove()
+                    delete oldObs[k][v]
+                    delete oldObs.data[k]
+                })
+                oldObs[k].remove()
+                delete oldObs[k]
+            }
+        })
+        oldObs.add(newValueArr)
+        return false
+    }
     if ( 
         checkTypes(newData) === 'Boolean' ||
         checkTypes(newData) === 'Number' ||
@@ -37,11 +73,11 @@ function isDiff( newData, oldObs ) {
             delete oldObs[v]
             delete oldObs.data[v]
         })
-        console.log ( 12312 )
         oldObs.replace( newData )
         return false
     }
 
+    
 
 } 
 
@@ -56,13 +92,13 @@ function addPorto(obj, key, val, {enumerable, configurable, writable} = {}) {
 
 function bindObs( obsDomObj, obsObj, key, value ) {
     Observable( obsObj, key, obsDomObj )
-    if ( value instanceof Array ) {
-        obsDomObj[key] = new Obs(value)
-        value.map( (v,i) => {
-            bindObs( obsDomObj[key], obsObj[key], i, v )
-        })
-        return
-    }
+    // if ( value instanceof Array ) {
+    //     obsDomObj[key] = new Obs(value)
+    //     value.map( (v,i) => {
+    //         bindObs( obsDomObj[key], obsObj[key], i, v )
+    //     })
+    //     return
+    // }
     if ( value instanceof Object ) {
         obsDomObj[key] = new Obs(value)
         // Observable( obsDataObj, key, obsDomObj , value )
@@ -166,11 +202,11 @@ class Obs {
             bindObs( this, this.data, k, newObject[k] )
             nV.push( this[k] )
         })
-        this.domtree.map( v => v( 1, nV) )
+        console.log ( newObject, nV )
+        this.domtree.map( v => v( 1, nV ) )
     }
 
     push( newValue ) {
-        // console.log ( this, 'push push' )
         if (!( newValue instanceof Array ) ) throw 'push argument need array'
         const len = Object.keys(this).length
         const valueLen = newValue.length
@@ -185,10 +221,8 @@ class Obs {
         this.domtree.map( v => v( 0, newValue) )
     }
 
-    rmove() {
-        Object.keys(this).map ( v => {
-            delete this[v]
-        })
+    remove() {
+        console.log (this.domtree)
         this.__get = undefined
         this.domtree.map( v => v( 2 ) )
     }
@@ -218,9 +252,9 @@ class Obs {
             if ( 
                 newValue.__get instanceof Element || 
                 newValue.__get instanceof Text || 
-                newValue.__get instanceof DocumentFragment 
-            ) return [this.renderValue ( newValue, 0 )] 
-            if ( Object.keys(newValue).length === 0 ) return [this.renderValue ( newValue, 0 )]
+                newValue.__get instanceof DocumentFragment ||
+                Object.keys(newValue).length === 0 
+            ) return [this.renderValue ( newValue, 0 )]
             const data = []
             ObjectMap( newValue, ( v, k ) => {
                 data.push(this.renderValue ( this[k], k ))
