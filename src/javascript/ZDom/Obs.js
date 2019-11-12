@@ -187,6 +187,7 @@ class Obs {
     }
 
     rmove() {
+        this.__get = undefined
         this.domtree.map( v => v( 2 ) )
     }
 
