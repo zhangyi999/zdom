@@ -12,8 +12,8 @@ function addList( ) {
 }
 
 function reloadeArr(){
-    this.data.date  = (i++)
-    this.data.list =' [{a:1}]'
+    this.data.date  = dom.p({},(i++))
+    // this.data.list =' [{a:1}]'
 }
  
 function chengeArr4(){

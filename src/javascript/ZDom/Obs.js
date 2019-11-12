@@ -28,15 +28,21 @@ function isDiff( newData, oldObs ) {
     if ( 
         checkTypes(newData) === 'Boolean' ||
         checkTypes(newData) === 'Number' ||
-        checkTypes(newData) === 'String'
+        checkTypes(newData) === 'String' ||
+        newData instanceof Element || 
+        newData instanceof Text || 
+        newData instanceof DocumentFragment 
     ) {
         Object.keys(oldObs).map ( v => {
             delete oldObs[v]
             delete oldObs.data[v]
         })
+        console.log ( 12312 )
         oldObs.replace( newData )
         return false
     }
+
+
 } 
 
 function addPorto(obj, key, val, {enumerable, configurable, writable} = {}) {
@@ -213,7 +219,7 @@ class Obs {
                 newValue.__get instanceof Element || 
                 newValue.__get instanceof Text || 
                 newValue.__get instanceof DocumentFragment 
-            ) return [this.renderValue ( newValue.__get, 0 )] 
+            ) return [this.renderValue ( newValue, 0 )] 
             if ( Object.keys(newValue).length === 0 ) return [this.renderValue ( newValue, 0 )]
             const data = []
             ObjectMap( newValue, ( v, k ) => {
