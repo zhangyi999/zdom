@@ -19,7 +19,7 @@ const ArrayElement = [
         // 从头部增加
         const addElement = creatDocumentFragment(newArray);
         const indexEl = oldRepalce[0];
-        prant = indexEl.parentElement
+        prant = indexEl.parentElement || prant
         oldRepalce.unshift( ...Array.from( addElement.childNodes ) );
         prant.insertBefore( addElement, indexEl );
         return oldRepalce;
@@ -28,7 +28,7 @@ const ArrayElement = [
         // 从尾部增加
         const addElement = creatDocumentFragment(newArray);
         const newPr = oldRepalce.concat( Array.from( addElement.childNodes ));
-        prant = oldRepalce[0].parentElement
+        prant = oldRepalce[0].parentElement || prant
         addElemens(prant, addElement,oldRepalce[oldRepalce.length -1] )
         return newPr
     },
@@ -61,8 +61,21 @@ const ArrayElement = [
 
 // domtree: 0 | 从头部增加，1 | 从尾部增加， 2 | 删除，3 | 替换  
 function replaceDom( type, prant, oldDom, obs, newValue ) {
-    // console.log (obs, newValue,'newValuenewValuenewValue' )
+    // console.log (obs, newValue,'newValuenewValuenewValue1-----' )
     const newDom = obs.render( newValue )
+    const renders = [...obs.renders]
+    if ( type === 0 || type === 1 ) {
+        newValue.map( v => {
+            v.domtree.push((type, newValue) => {
+                v.renders.push(...renders)
+                // console.log( newValue )
+                // bug 老节点
+                // console.log ( obs, newValue, ' obsobsobs' )
+                oldDom = replaceDom( type, prant, newDom, v, newValue )
+                v.renders.length = 0
+            })
+        })
+    }
     //  console.log ( newDom, newValue,'newValuenewValuenewValue' )
     return ArrayElement[type]( prant, oldDom, newDom, newValue )
 }
@@ -81,17 +94,45 @@ function addObsDom( prant, obs ) {
                 obs[k].renders.push(...renders)
             // }            
             addChild ( fragment, obs[k] )
+            console.log (
+                fragment.childNodes, 
+                [fragment.childNodes[k].parentElement],
+                obs,
+                'childNodeschildNodeschildNodes' 
+            )
+            // obs.domtree.push((type, newValue) => {
+            //     obs.renders.push(...renders)
+            //     // console.log( newValue )
+            //     // bug 老节点
+            //     // console.log ( obs, newValue, ' obsobsobs' )
+            //     oldDom = replaceDom( type, prant, oldDom, obs, newValue )
+            //     obs.renders.length = 0
+            // })
+            // obs.renders.length = 0
         })
-    } else {
-        addChild ( fragment, obs.render() )
-    }
+        
+    } 
+    // else if  ( obs.__get instanceof Object ) {
+    //     ObjectMap( obs.__get, (v,k) => {
+    //         // 数组子元素继承 数组的 渲染 模式
+    //         // if ( v instanceof Obs ){
+    //         //     obs[k].renders.push(...renders)
+    //         // }            
+    //         addChild ( fragment, obs[k] )
+    //     })
+    // } 
+    else {
+        addChild ( fragment, obs.render( ))
+    } 
     // const ddf = obs.render()
     // addChild ( fragment, ddf )
     
     let oldDom = Array.from( fragment.childNodes )
     prant.appendChild( fragment )
+    console.log( obs , fragment, 'obsobsobsobsobsobsobsobs' )
     obs.domtree.push((type, newValue) => {
         obs.renders.push(...renders)
+        // console.log( newValue )
         // bug 老节点
         // console.log ( obs, newValue, ' obsobsobs' )
         oldDom = replaceDom( type, prant, oldDom, obs, newValue )
@@ -139,7 +180,7 @@ function setAttribute(dom, key, attrs) {
 function supplementArray( arr ) {
     let supplement = ''
     arr.map( (v = '') => {
-        supplement += v instanceof Obs ? v.get :v
+        supplement += v instanceof Obs ? v.__get :v
     })
     return supplement
 }
@@ -170,7 +211,8 @@ function mapAttr( dom, arr ) {
         }
 
         if ( value instanceof Obs ) {
-            value.attrtree.push( function ( ) {
+            value.attrtree.push( function ( type ) {
+                if ( type === 2 ) return dom.remove()
                 setAttribute(dom, key, value.__get )
             })
             return setAttribute(dom, key, value.__get );
@@ -180,7 +222,8 @@ function mapAttr( dom, arr ) {
             value = value.flat(Infinity);
             value.map( v => {
                 if ( v instanceof Obs ) {
-                    v.attrtree.push( function ( ) {
+                    v.attrtree.push( function ( type ) {
+                        if ( type === 2 ) return dom.remove()
                         setAttribute(dom, key, supplementArray( value ))
                     })
                 }

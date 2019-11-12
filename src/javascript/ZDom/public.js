@@ -2,7 +2,7 @@ import checkTypes from './types'
 
 export function ObjectMap(obj, call) {
     if ( obj === undefined ) return 
-    const res = {}
+    const res = obj instanceof Array ? [] : {}
     const keys = Object.keys(obj)
     const len = keys.length
     for(let i = 0; i < len; i ++) {

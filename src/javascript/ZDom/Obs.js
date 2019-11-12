@@ -16,32 +16,67 @@ function Observable( obj, key, obs ) {
 }
 
 // return ture is diff status
-function isDiff( oldData, newData ) {
-    if ( oldData == newData ) return false
-    let diff = false
-    if ( checkTypes(oldData) === 'Array' &&  checkTypes(newData) === 'Array' ) {
-        const olen = oldData.length
-        const nlen = newData.length
-        if ( olen !== nlen ) return true
-        for ( let i = 0; i < olen; i++ ) {
-            if ( isDiff( oldData[i], newData[i] ) === true ) {
-                diff = true
-                break; 
+
+function isDiff( newData, oldObs ) {
+    const oldData = oldObs.__get
+    // console.log ( newData, oldData, checkTypes(newData) , checkTypes(oldData) )
+    if ( 
+        ( newData instanceof Object || oldData instanceof Object ) &&
+        checkTypes(newData) !== checkTypes(oldData)  
+    ) throw '值为对象时，不可改变值得类型'
+    if ( newData === oldData ) return false
+    if ( newData instanceof Object ) {
+        const newValueArr = {}
+        // console.log  ( newData )
+        ObjectMap( newData, (v,k) => {
+            if ( oldData[k] === undefined ) {
+                newValueArr[k] = v
+            } else {
+                // 0.3 只考虑 [{}] 一层状态，哈哈，能力有限，请见谅
+                if ( v instanceof Object ) {
+                    ObjectMap( v, (v, k1) => {
+                        isDiff( v, oldObs[k][k1] )
+                    })
+                } else {
+                    isDiff( v, oldObs[k] )
+                }
             }
-        }
-        return diff
-    }
-    if ( checkTypes(oldData) === 'Object' &&  checkTypes(newData) === 'Object' ) { 
-        for ( let i in  oldData ) {
-            if ( isDiff( oldData[i], newData[i] ) === true ) {
-                diff = true
-                break; 
+        })
+        ObjectMap( oldData, (v,k) => {
+            if ( newData[k] === undefined ) {
+                // Object.keys(oldObs[k]).map ( v => {
+                //     oldObs[k][v].remove()
+                //     delete oldObs[k][v]
+                //     delete oldObs.data[k]
+                // })
+                console.log ( k, oldObs )
+                oldObs[k].remove()
+                delete oldObs[k]
+                delete oldObs.data[k]
             }
-        }
-        return diff
+        })
+        oldObs.add(newValueArr, 1)
+        return false
     }
-    if ( oldData != newData ) return true
-}
+    if ( 
+        checkTypes(newData) === 'Boolean' ||
+        checkTypes(newData) === 'Number' ||
+        checkTypes(newData) === 'String' ||
+        newData instanceof Element || 
+        newData instanceof Text || 
+        newData instanceof DocumentFragment 
+    ) {
+        Object.keys(oldObs).map ( v => {
+            delete oldObs[v]
+            delete oldObs.data[v]
+        })
+        oldObs.replace( newData )
+        return false
+    }
+
+    
+
+} 
 
 function addPorto(obj, key, val, {enumerable, configurable, writable} = {}) {
     Object.defineProperty(obj, key, {
@@ -54,13 +89,13 @@ function addPorto(obj, key, val, {enumerable, configurable, writable} = {}) {
 
 function bindObs( obsDomObj, obsObj, key, value ) {
     Observable( obsObj, key, obsDomObj )
-    if ( value instanceof Array ) {
-        obsDomObj[key] = new Obs(value)
-        value.map( (v,i) => {
-            bindObs( obsDomObj[key], obsObj[key], i, v )
-        })
-        return
-    }
+    // if ( value instanceof Array ) {
+    //     obsDomObj[key] = new Obs(value)
+    //     value.map( (v,i) => {
+    //         bindObs( obsDomObj[key], obsObj[key], i, v )
+    //     })
+    //     return
+    // }
     if ( value instanceof Object ) {
         obsDomObj[key] = new Obs(value)
         // Observable( obsDataObj, key, obsDomObj , value )
@@ -89,17 +124,31 @@ class Obs {
         addPorto(this, '__get', valueAny, {writable:true})
         addPorto(this, '__set', ( newValue ) => {
             
-            if ( newValue === null ) return this.rmove()
-            if ( isDiff( newValue, this.__get ) === false ) return
+            // if ( newValue === null ) return this.rmove()
+            if ( isDiff( newValue, this ) === false ) return
+            
+            // Object.keys(this).map ( v => {
+            //     delete this[v]
+            // })
 
-            Object.keys(this).map ( v => {
-                delete this[v]
-                delete this.data
-            })
-            this.init( newValue )
-            this.domtree.map( v => v(3, this) );
-            this.attrtree.map( v => v());
-            this.watch.map( v => v(newValue) );
+            // delete this.data
+            // const domtree = [...this.domtree]
+            // const attrtree = [...this.attrtree]
+            // const watch = [...this.watch]
+            // this.domtree.length = 0
+            // // this.attrtree.length = 0
+            // this.watch.length = 0
+            // // this.domtree.length = 0
+
+            // this.init( newValue )
+
+            // domtree.map( v => v(3, this) );
+            // attrtree.map( v => v());
+            // watch.map( v => v(newValue) );
+            // // 非对象类型重置时会重新渲染，push domtree
+            // if ( !( newValue instanceof Object) ) return
+            // this.domtree.push(...domtree)
+            // this.watch.push(...watch)
         })
         this.init( valueAny )
     }
@@ -113,14 +162,11 @@ class Obs {
                 return this.__get
             },
             set(newVal) {
+                // console.log ( this, newVal )
                 this.__set(newVal)
             }
         });
-        if ( valueAny instanceof Array ) {
-            this.__get.map((v,k)=>{
-                bindObs( this, this.data, k, v )
-            })
-        } else if ( valueAny instanceof Object ) {
+        if ( valueAny instanceof Object ) {
             ObjectMap(this.__get, (v,k)=>{
                 bindObs( this, this.data, k, v )
             })
@@ -128,25 +174,65 @@ class Obs {
         
     }
 
+    replace ( newOnObject ) {
+        this.__get = newOnObject
+
+        const domtree = [...this.domtree]
+        const attrtree = [...this.attrtree]
+        const watch = [...this.watch]
+        this.domtree.length = 0
+        // this.attrtree.length = 0
+        // this.watch.length = 0
+
+        domtree.map( v => v(3, this) );
+        attrtree.map( v => v());
+        watch.map( v => v(newOnObject) );
+        // 非对象类型重置时会重新渲染，push domtree
+        // if ( !( newValue instanceof Object) ) return
+        // this.domtree.push(...domtree)
+        // this.watch.push(...watch)
+    }
+
+    add ( newObject, typeAdd = 0 ) {
+        const nV = []
+        ObjectMap( newObject, (v, k) => {
+            // console.log ( newObject, newObject[k] )
+            bindObs( this, this.data, k, newObject[k] )
+            nV.push( this[k] )
+        })
+        this.domtree.map( v => v(  typeAdd, nV ) )
+    }
+
     push( newValue ) {
         if (!( newValue instanceof Array ) ) throw 'push argument need array'
         const len = Object.keys(this).length
         const valueLen = newValue.length
-        const nV = []
+        const nV = {}
         for ( let i = 0; i < valueLen; i++ ) {
-            bindObs( this, this.data, i + len, newValue[i] )
-            nV.push( this[i + len] )
-            this.__get[i + len] = newValue[i]
+            nV[i + len] = newValue[i]
         }
-        this.domtree.map( v => v( 1, nV) )
+        this.add ( nV, 1 )
     }
 
     unshift( newValue ) {
-        this.domtree.map( v => v( 0, newValue) )
+        if (!( newValue instanceof Array ) ) throw 'push argument need array'
+        const len = Object.keys(this).length
+        const valueLen = newValue.length
+        // const nV = {}
+        for ( let i = 0; i < len; i++ ) {
+            // nV[len] = newValue[i]
+            const k = len - 1 - i
+            this[ k + valueLen ] = this[ k ]
+            // console.log ( this[ k + valueLen ] )
+            bindObs( this, this.data, k + valueLen, this[ k ].__get )
+        }
+        this.add ( newValue )
     }
 
-    rmove() {
+    remove() {
+        this.__get = undefined
         this.domtree.map( v => v( 2 ) )
+        // this.attrtree.map( v => v( 2 ) )
     }
 
     map( fun ) {
@@ -157,8 +243,9 @@ class Obs {
     renderValue ( v, i ) {
         let prvValue = v;
         this.renders.map( fn => {
-            prvValue = fn( prvValue, i )
+            if ( prvValue !== undefined ) prvValue = fn( prvValue, i )
         })
+        console.log ( v,prvValue, i,'dsfsdfs' )
         return prvValue
     }
 
@@ -167,17 +254,22 @@ class Obs {
     }
 
     render( newValue = this.__get ) {
-        if ( this.renders.length === 0 ) return newValue
-        if ( newValue instanceof Obs ) {
-            if ( typeof newValue.__get !== 'object' ) return [this.renderValue ( newValue.__get, 0 )]
-            if ( newValue.__get instanceof Element || newValue.__get instanceof Text || newValue.__get instanceof DocumentFragment ) return [this.renderValue ( newValue.__get, 0 )] 
-            const data = []
-            ObjectMap( newValue, ( v, k ) => {
-                data.push(this.renderValue ( v, k ))
-            })
-            return data
-        }
+        // if ( this.renders.length === 0 ) return newValue
         if ( newValue instanceof Array ) return this.renderArray( newValue )
+        if ( newValue instanceof Object || newValue instanceof Obs ) {
+            // if ( typeof newValue.__get !== 'object' ) return [this.renderValue ( newValue, 0 )]
+            if ( 
+                newValue.__get instanceof Element || 
+                newValue.__get instanceof Text || 
+                newValue.__get instanceof DocumentFragment ||
+                Object.keys(newValue).length === 0 
+            ) return [this.renderValue ( newValue, 0 )]
+            // const data = []
+            // ObjectMap( newValue, ( v, k ) => {
+            //     data.push(this.renderValue ( this[k], k ))
+            // })
+            return [this.renderValue ( this, 0 )]
+        }
         return this.renderValue ( newValue )
     }
 }
