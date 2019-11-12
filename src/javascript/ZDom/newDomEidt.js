@@ -19,7 +19,7 @@ const ArrayElement = [
         // 从头部增加
         const addElement = creatDocumentFragment(newArray);
         const indexEl = oldRepalce[0];
-        prant = indexEl.parentElement
+        prant = indexEl.parentElement || prant
         oldRepalce.unshift( ...Array.from( addElement.childNodes ) );
         prant.insertBefore( addElement, indexEl );
         return oldRepalce;
@@ -28,7 +28,7 @@ const ArrayElement = [
         // 从尾部增加
         const addElement = creatDocumentFragment(newArray);
         const newPr = oldRepalce.concat( Array.from( addElement.childNodes ));
-        prant = oldRepalce[0].parentElement
+        prant = oldRepalce[0].parentElement || prant
         addElemens(prant, addElement,oldRepalce[oldRepalce.length -1] )
         return newPr
     },
@@ -63,6 +63,19 @@ const ArrayElement = [
 function replaceDom( type, prant, oldDom, obs, newValue ) {
     // console.log (obs, newValue,'newValuenewValuenewValue1-----' )
     const newDom = obs.render( newValue )
+    const renders = [...obs.renders]
+    if ( type === 0 || type === 1 ) {
+        newValue.map( v => {
+            v.domtree.push((type, newValue) => {
+                v.renders.push(...renders)
+                // console.log( newValue )
+                // bug 老节点
+                // console.log ( obs, newValue, ' obsobsobs' )
+                oldDom = replaceDom( type, prant, newDom, v, newValue )
+                v.renders.length = 0
+            })
+        })
+    }
     //  console.log ( newDom, newValue,'newValuenewValuenewValue' )
     return ArrayElement[type]( prant, oldDom, newDom, newValue )
 }
@@ -81,7 +94,23 @@ function addObsDom( prant, obs ) {
                 obs[k].renders.push(...renders)
             // }            
             addChild ( fragment, obs[k] )
+            console.log (
+                fragment.childNodes, 
+                [fragment.childNodes[k].parentElement],
+                obs,
+                'childNodeschildNodeschildNodes' 
+            )
+            // obs.domtree.push((type, newValue) => {
+            //     obs.renders.push(...renders)
+            //     // console.log( newValue )
+            //     // bug 老节点
+            //     // console.log ( obs, newValue, ' obsobsobs' )
+            //     oldDom = replaceDom( type, prant, oldDom, obs, newValue )
+            //     obs.renders.length = 0
+            // })
+            // obs.renders.length = 0
         })
+        
     } 
     // else if  ( obs.__get instanceof Object ) {
     //     ObjectMap( obs.__get, (v,k) => {
@@ -93,15 +122,14 @@ function addObsDom( prant, obs ) {
     //     })
     // } 
     else {
-        // console.log ( obs, 'obssss' )
-        addChild ( fragment, obs.render( ) )
-    }
+        addChild ( fragment, obs.render( ))
+    } 
     // const ddf = obs.render()
     // addChild ( fragment, ddf )
     
     let oldDom = Array.from( fragment.childNodes )
     prant.appendChild( fragment )
-    // console.log( obs , fragment, 'obsobsobsobsobsobsobsobs' )
+    console.log( obs , fragment, 'obsobsobsobsobsobsobsobs' )
     obs.domtree.push((type, newValue) => {
         obs.renders.push(...renders)
         // console.log( newValue )

@@ -24,9 +24,10 @@ function isDiff( newData, oldObs ) {
         ( newData instanceof Object || oldData instanceof Object ) &&
         checkTypes(newData) !== checkTypes(oldData)  
     ) throw '值为对象时，不可改变值得类型'
-    if ( newData == oldData ) return false
+    if ( newData === oldData ) return false
     if ( newData instanceof Object ) {
         const newValueArr = {}
+        // console.log  ( newData )
         ObjectMap( newData, (v,k) => {
             if ( oldData[k] === undefined ) {
                 newValueArr[k] = v
@@ -43,16 +44,18 @@ function isDiff( newData, oldObs ) {
         })
         ObjectMap( oldData, (v,k) => {
             if ( newData[k] === undefined ) {
-                Object.keys(oldObs[k]).map ( v => {
-                    oldObs[k][v].remove()
-                    delete oldObs[k][v]
-                    delete oldObs.data[k]
-                })
+                // Object.keys(oldObs[k]).map ( v => {
+                //     oldObs[k][v].remove()
+                //     delete oldObs[k][v]
+                //     delete oldObs.data[k]
+                // })
+                console.log ( k, oldObs )
                 oldObs[k].remove()
                 delete oldObs[k]
+                delete oldObs.data[k]
             }
         })
-        oldObs.add(newValueArr)
+        oldObs.add(newValueArr, 1)
         return false
     }
     if ( 
@@ -197,8 +200,7 @@ class Obs {
             bindObs( this, this.data, k, newObject[k] )
             nV.push( this[k] )
         })
-        // console.log ( newObject, nV )
-        this.domtree.map( v => v( typeAdd, nV ) )
+        this.domtree.map( v => v(  typeAdd, nV ) )
     }
 
     push( newValue ) {
@@ -230,7 +232,7 @@ class Obs {
     remove() {
         this.__get = undefined
         this.domtree.map( v => v( 2 ) )
-        this.attrtree.map( v => v( 2 ) )
+        // this.attrtree.map( v => v( 2 ) )
     }
 
     map( fun ) {
@@ -243,6 +245,7 @@ class Obs {
         this.renders.map( fn => {
             if ( prvValue !== undefined ) prvValue = fn( prvValue, i )
         })
+        console.log ( v,prvValue, i,'dsfsdfs' )
         return prvValue
     }
 
@@ -261,11 +264,11 @@ class Obs {
                 newValue.__get instanceof DocumentFragment ||
                 Object.keys(newValue).length === 0 
             ) return [this.renderValue ( newValue, 0 )]
-            const data = []
-            ObjectMap( newValue, ( v, k ) => {
-                data.push(this.renderValue ( this[k], k ))
-            })
-            return data
+            // const data = []
+            // ObjectMap( newValue, ( v, k ) => {
+            //     data.push(this.renderValue ( this[k], k ))
+            // })
+            return [this.renderValue ( this, 0 )]
         }
         return this.renderValue ( newValue )
     }

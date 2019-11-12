@@ -32,7 +32,7 @@ function Commponent(ZDomCommponFunction) {
                 })
                 addPorto(props, key, v)
                 
-            } else props.props[k] = v
+            } else props.props[key] = v
         })
         const dom = ZDomCommponFunction.call(props, chlid);
         props.loaded?setTimeout(()=> props.loaded(),0):''; 

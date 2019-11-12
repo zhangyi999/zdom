@@ -7,12 +7,13 @@ import dom,{Obs, Commponent} from './ZDom'
  */ 
 let i = 0
 function addList( ) {
-    this.list.push([{a:1}])
+    this.list.push([{a:99}])
     console.log  ( this )
 }
 
 function reloadeArr(){
     this.data.date  = i++
+    console.log ( this.data.list)
     this.data.list = [{a:i++}]
 }
  
@@ -31,14 +32,14 @@ function chengeArr4(){
 }
 
 function Test( ...child ) {
-    const dk = new Obs({k: 'sdffssd'})
-    console.log ( this)
-    setTimeout(() => {
-        dk.data.k = 123312
-        this.props.a = 21332213 
-    }, 4000);
+    // const dk = new Obs({k: 'sdffssd'})
+    // console.log ( this)
+    // setTimeout(() => {
+    //     dk.data.k = 123312
+    //     this.props.a = 21332213 
+    // }, 4000);
     return (
-        dom.div({class: dk.k}, this.a || '')
+        dom.div({class: 'dk.k'}, this.a || '')
     )
 }
 
@@ -64,6 +65,7 @@ function Index() {
         // ]
     })
     let i = 0
+    console.log ( $ )
     // const k =  setInterval(() => {
     //     i ++
     //     console.log ( $ )
@@ -75,14 +77,19 @@ function Index() {
             // dom.h2({},'this is demo'),
             dom.div({}, 
                 // dom.h4({},'time'),
-                dom.p({}, $.date )
+                // dom.p({}, $.date )
             ),
             dom.div({}, 
                 // dom.h4({},'list'),
-                TestCommpent({a:$.date}),
-                dom.p({}, $.list[1].a ),
+                // TestCommpent({a:$.date}),
+                // dom.p({}, $.list[1].a ),
                 dom.p({}, $.list.map( v => {
-                    return dom.input({type: 'checkbox',checked:v.a || v, class: v.a || v }) 
+                    console.log ( v, 'vvvssss' )
+                    return TestCommpent({a:v.a.map(v => {
+                        console.log ( v, 'vvvssss1' )
+                        return v 
+                    })}) 
+                    // return dom.input({class:v.a,checked: v.a, type:'checkbox'})
                 }) )
             ),
             // dom.div({}, 
