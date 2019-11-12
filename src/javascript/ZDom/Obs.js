@@ -227,9 +227,10 @@ class Obs {
     }
 
     renderValue ( v, i ) {
+        
         let prvValue = v;
         this.renders.map( fn => {
-            prvValue = fn( prvValue, i )
+            if ( prvValue !== undefined ) prvValue = fn( prvValue, i )
         })
         return prvValue
     }

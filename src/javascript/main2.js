@@ -40,7 +40,7 @@ function Index() {
             // {a:'true'},
             // false,
             {a:false},
-            // {a:true},
+            {a:true},
             // {a:true}
         ],
         // deepLisst: [
@@ -65,7 +65,7 @@ function Index() {
             ),
             dom.div({}, 
                 // dom.h4({},'list'),
-                dom.p({}, $.list[0].a ),
+                dom.p({}, $.list[1].a ),
                 dom.p({}, $.list.map( v => {
                     return dom.input({type: 'checkbox',checked:v.a || v, class: v.a || v }) 
                 }) )
