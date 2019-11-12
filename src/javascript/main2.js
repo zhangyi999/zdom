@@ -1,5 +1,5 @@
 
-import dom,{Obs} from './ZDom'
+import dom,{Obs, Commponent} from './ZDom'
 
 /**
     bug
@@ -12,7 +12,7 @@ function addList( ) {
 }
 
 function reloadeArr(){
-    // this.data.date  = [123]
+    this.data.date  = i++
     this.data.list = [{a:i++}]
 }
  
@@ -29,6 +29,20 @@ function chengeArr4(){
         this.list[0]
     )
 }
+
+function Test( ...child ) {
+    const dk = new Obs({k: 'sdffssd'})
+    console.log ( this)
+    setTimeout(() => {
+        dk.data.k = 123312
+        this.props.a = 21332213 
+    }, 4000);
+    return (
+        dom.div({class: dk.k}, this.a || '')
+    )
+}
+
+const TestCommpent = Commponent(Test)
 
 function Index() {
     const $ = new Obs({
@@ -65,6 +79,7 @@ function Index() {
             ),
             dom.div({}, 
                 // dom.h4({},'list'),
+                TestCommpent({a:$.date}),
                 dom.p({}, $.list[1].a ),
                 dom.p({}, $.list.map( v => {
                     return dom.input({type: 'checkbox',checked:v.a || v, class: v.a || v }) 

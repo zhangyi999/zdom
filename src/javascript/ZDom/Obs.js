@@ -190,14 +190,15 @@ class Obs {
         // this.watch.push(...watch)
     }
 
-    add ( newObject ) {
+    add ( newObject, typeAdd = 0 ) {
         const nV = []
         ObjectMap( newObject, (v, k) => {
+            // console.log ( newObject, newObject[k] )
             bindObs( this, this.data, k, newObject[k] )
             nV.push( this[k] )
         })
         // console.log ( newObject, nV )
-        this.domtree.map( v => v( 1, nV ) )
+        this.domtree.map( v => v( typeAdd, nV ) )
     }
 
     push( newValue ) {
@@ -208,11 +209,22 @@ class Obs {
         for ( let i = 0; i < valueLen; i++ ) {
             nV[i + len] = newValue[i]
         }
-        this.add ( nV )
+        this.add ( nV, 1 )
     }
 
     unshift( newValue ) {
-        this.domtree.map( v => v( 0, newValue) )
+        if (!( newValue instanceof Array ) ) throw 'push argument need array'
+        const len = Object.keys(this).length
+        const valueLen = newValue.length
+        // const nV = {}
+        for ( let i = 0; i < len; i++ ) {
+            // nV[len] = newValue[i]
+            const k = len - 1 - i
+            this[ k + valueLen ] = this[ k ]
+            // console.log ( this[ k + valueLen ] )
+            bindObs( this, this.data, k + valueLen, this[ k ].__get )
+        }
+        this.add ( newValue )
     }
 
     remove() {
@@ -227,7 +239,6 @@ class Obs {
     }
 
     renderValue ( v, i ) {
-        
         let prvValue = v;
         this.renders.map( fn => {
             if ( prvValue !== undefined ) prvValue = fn( prvValue, i )
