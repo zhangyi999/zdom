@@ -161,13 +161,11 @@ class Obs {
         if (!( newValue instanceof Array ) ) throw 'push argument need array'
         const len = Object.keys(this).length
         const valueLen = newValue.length
-        const nV = []
+        const nV = {}
         for ( let i = 0; i < valueLen; i++ ) {
-            bindObs( this, this.data, i + len, newValue[i] )
-            nV.push( this[i + len] )
-            this.__get[i + len] = newValue[i]
+            nV[i + len] = this[i + len]
         }
-        this.domtree.map( v => v( 1, nV) )
+        this.add ( nV )
     }
 
     unshift( newValue ) {

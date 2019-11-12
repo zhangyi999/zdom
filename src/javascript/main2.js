@@ -7,7 +7,7 @@ import dom,{Obs} from './ZDom'
  */ 
 let i = 0
 function addList( ) {
-    this.list.add([22,{a:1}])
+    this.list.push([22,{a:1}])
     console.log  ( this )
 }
 
