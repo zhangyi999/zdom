@@ -147,6 +147,15 @@ class Obs {
         this.domtree.map( v => v(3, this) )
     }
 
+    add ( newObject ) {
+        const nV = []
+        ObjectMap( newObject, (v, k) => {
+            bindObs( this, this.data, k, newObject[k] )
+            nV.push( this[k] )
+        })
+        this.domtree.map( v => v( 1, nV) )
+    }
+
     push( newValue ) {
         // console.log ( this, 'push push' )
         if (!( newValue instanceof Array ) ) throw 'push argument need array'
