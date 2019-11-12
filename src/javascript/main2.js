@@ -3,7 +3,7 @@ import dom,{Obs} from './ZDom'
 
 /**
     bug
-    1 string 会导致内存泄漏
+    1 map 函数v只能用 获取 最底层数据 
  */ 
 let i = 0
 function addList( ) {
@@ -13,27 +13,32 @@ function addList( ) {
 
 function reloadeArr(){
     this.data.date = i++
-    // this.data.list = [i++]
+    this.data.list = [i++]
 }
  
 function chengeArr4(){
-    console.log ( this.data.list[6], this, this.deepLisst )
+    // console.log ( this.data.list[6], this, this.deepLisst )
     // this.list[6].__set({a:('sdffff')}) // 
-    this.data.list[6].a = (dom.b({},'this is 4'))
-    // this.deepLisst[0].__set({a:{b:'33333'}})
+    // this.data.list[6].a = (dom.b({},'this is 4'))
+    // this.data.deepLisst[0] = ({a:{b:'33333'}})
+    this.data.list[0].a = !this.data.list[0].a
+    console.log ( this.data.list[0].a )
+    console.log(
+        this.list[0]
+    )
 }
 
 function Index() {
     const $ = new Obs({
         date: '--',
         list: [
-            1,
+            // 1,
             // 3,
             // 5,
-            {a:1},
-            {a:1},
-            {a:1},
-            {a:1}
+            // {a:'true'},
+            {a:false},
+            // {a:true},
+            // {a:true}
         ],
         // deepLisst: [
         //     {a:{
@@ -50,24 +55,27 @@ function Index() {
     // }, 1000);
     return (
         dom.div({},
-            dom.h2({},'this is demo'),
+            // dom.h2({},'this is demo'),
             dom.div({}, 
-                dom.h4({},'time'),
+                // dom.h4({},'time'),
                 // dom.p({}, $.date )
             ),
             dom.div({}, 
-                dom.h4({},'list'),
-                dom.p({}, $.date ),
-                dom.p({}, $.list.map( v => v.a || v) )
+                // dom.h4({},'list'),
+                // dom.p({}, $.date ),
+                dom.p({}, $.list.map( v => {
+                    console.log ( v, 'vvvvv' )
+                    return dom.input({type: 'checkbox',checked:v.a || v, class: v.a || v }) 
+                }) )
             ),
-            dom.div({}, 
-                dom.h4({},'list'),
-                // dom.p({}, $.deepLisst.map( v => {
-                //     console.log ( v.a ,'cccssss')
-                //     return dom.p({}, v.a.b )
-                // }) ),
-                // dom.p({}, $.list.map( v => dom.p({}, v.a || v)) )
-            ),
+            // dom.div({}, 
+            //     dom.h4({},'list'),
+            //     // dom.p({}, $.deepLisst.map( v => {
+            //     //     console.log ( v ,'cccssss')
+            //     //     return dom.p({}, v.b )
+            //     // }) ),
+            //     // dom.p({}, $.list.map( v => dom.p({}, v.a || v)) )
+            // ),
             
             dom.p({},
                 dom.a({

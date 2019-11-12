@@ -82,15 +82,26 @@ function addObsDom( prant, obs ) {
             // }            
             addChild ( fragment, obs[k] )
         })
-    } else {
-        addChild ( fragment, obs.render() )
+    } 
+    // else if  ( obs.__get instanceof Object ) {
+    //     ObjectMap( obs.__get, (v,k) => {
+    //         // 数组子元素继承 数组的 渲染 模式
+    //         // if ( v instanceof Obs ){
+    //         //     obs[k].renders.push(...renders)
+    //         // }            
+    //         addChild ( fragment, obs[k] )
+    //     })
+    // } 
+    else {
+        // console.log ( obs, 'obssss' )
+        addChild ( fragment, obs.render( ) )
     }
     // const ddf = obs.render()
     // addChild ( fragment, ddf )
     
     let oldDom = Array.from( fragment.childNodes )
     prant.appendChild( fragment )
-    // console.log( obs, 'obsobsobsobsobsobsobsobs' )
+    // console.log( obs , fragment, 'obsobsobsobsobsobsobsobs' )
     obs.domtree.push((type, newValue) => {
         obs.renders.push(...renders)
         // console.log( newValue )
@@ -141,7 +152,7 @@ function setAttribute(dom, key, attrs) {
 function supplementArray( arr ) {
     let supplement = ''
     arr.map( (v = '') => {
-        supplement += v instanceof Obs ? v.get :v
+        supplement += v instanceof Obs ? v.__get :v
     })
     return supplement
 }

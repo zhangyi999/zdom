@@ -89,9 +89,9 @@ class Obs {
         addPorto(this, '__get', valueAny, {writable:true})
         addPorto(this, '__set', ( newValue ) => {
             
-            if ( newValue === null ) return this.rmove()
+            // if ( newValue === null ) return this.rmove()
             if ( isDiff( newValue, this.__get ) === false ) return
-
+            
             Object.keys(this).map ( v => {
                 delete this[v]
                 delete this.data
@@ -100,7 +100,7 @@ class Obs {
             const attrtree = [...this.attrtree]
             const watch = [...this.watch]
             this.domtree.length = 0
-            this.attrtree.length = 0
+            // this.attrtree.length = 0
             this.watch.length = 0
             // this.domtree.length = 0
 
@@ -112,7 +112,7 @@ class Obs {
             // 非对象类型重置时会重新渲染，push domtree
             if ( !( newValue instanceof Object) ) return
             this.domtree.push(...domtree)
-            this.attrtree.push(...attrtree)
+            // this.attrtree.push(...attrtree)
             this.watch.push(...watch)
         })
         this.init( valueAny )
@@ -144,7 +144,7 @@ class Obs {
     }
 
     push( newValue ) {
-        console.log ( this, 'push push' )
+        // console.log ( this, 'push push' )
         if (!( newValue instanceof Array ) ) throw 'push argument need array'
         const len = Object.keys(this).length
         const valueLen = newValue.length
@@ -183,18 +183,18 @@ class Obs {
     }
 
     render( newValue = this.__get ) {
-        console.log ( newValue )
         // if ( this.renders.length === 0 ) return newValue
-        if ( newValue instanceof Obs ) {
-            if ( typeof newValue.__get !== 'object' ) return [this.renderValue ( newValue, 0 )]
+
+        if ( newValue instanceof Array ) return this.renderArray( newValue )
+        if ( newValue instanceof Object ) {
+            // if ( typeof newValue.__get !== 'object' ) return [this.renderValue ( newValue, 0 )]
             if ( newValue.__get instanceof Element || newValue.__get instanceof Text || newValue.__get instanceof DocumentFragment ) return [this.renderValue ( newValue.__get, 0 )] 
             const data = []
             ObjectMap( newValue, ( v, k ) => {
-                data.push(this.renderValue ( v, k ))
+                data.push(this.renderValue ( this[k], k ))
             })
             return data
         }
-        if ( newValue instanceof Array ) return this.renderArray( newValue )
         return this.renderValue ( newValue )
     }
 }
