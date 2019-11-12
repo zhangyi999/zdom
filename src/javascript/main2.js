@@ -13,7 +13,7 @@ function addList( ) {
 
 function reloadeArr(){
     this.data.date = i++
-    this.data.list = [i++]
+    this.data.list = [{a:1}]
 }
  
 function chengeArr4(){
