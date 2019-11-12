@@ -61,9 +61,9 @@ const ArrayElement = [
 
 // domtree: 0 | 从头部增加，1 | 从尾部增加， 2 | 删除，3 | 替换  
 function replaceDom( type, prant, oldDom, obs, newValue ) {
-    console.log (obs, newValue,'newValuenewValuenewValue1-----' )
+    // console.log (obs, newValue,'newValuenewValuenewValue1-----' )
     const newDom = obs.render( newValue )
-     console.log ( newDom, newValue,'newValuenewValuenewValue' )
+    //  console.log ( newDom, newValue,'newValuenewValuenewValue' )
     return ArrayElement[type]( prant, oldDom, newDom, newValue )
 }
 
@@ -101,7 +101,7 @@ function addObsDom( prant, obs ) {
     
     let oldDom = Array.from( fragment.childNodes )
     prant.appendChild( fragment )
-    console.log( obs , fragment, 'obsobsobsobsobsobsobsobs' )
+    // console.log( obs , fragment, 'obsobsobsobsobsobsobsobs' )
     obs.domtree.push((type, newValue) => {
         obs.renders.push(...renders)
         // console.log( newValue )
@@ -183,7 +183,8 @@ function mapAttr( dom, arr ) {
         }
 
         if ( value instanceof Obs ) {
-            value.attrtree.push( function ( ) {
+            value.attrtree.push( function ( type ) {
+                if ( type === 2 ) return dom.remove()
                 setAttribute(dom, key, value.__get )
             })
             return setAttribute(dom, key, value.__get );
@@ -193,7 +194,8 @@ function mapAttr( dom, arr ) {
             value = value.flat(Infinity);
             value.map( v => {
                 if ( v instanceof Obs ) {
-                    v.attrtree.push( function ( ) {
+                    v.attrtree.push( function ( type ) {
+                        if ( type === 2 ) return dom.remove()
                         setAttribute(dom, key, supplementArray( value ))
                     })
                 }

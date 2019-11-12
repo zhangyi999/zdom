@@ -24,6 +24,7 @@ function chengeArr4(){
 
     console.log ( this.data.list )
     this.data.list[0].a = !this.data.list[0].a
+    this.data.list[2].a = !this.data.list[2].a
     console.log(
         this.list[0]
     )

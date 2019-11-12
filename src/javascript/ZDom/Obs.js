@@ -1,12 +1,6 @@
 import checkTypes from './types'
 import { ObjectMap } from './public'
 
-
-console.log(
-checkTypes(true),
-checkTypes(1),
-checkTypes('1')
-)
 function Observable( obj, key, obs ) {
     Object.defineProperty(obj, key, {
         enumerable: true, // 可枚举
@@ -25,7 +19,7 @@ function Observable( obj, key, obs ) {
 
 function isDiff( newData, oldObs ) {
     const oldData = oldObs.__get
-    console.log ( newData, oldData, checkTypes(newData) , checkTypes(oldData) )
+    // console.log ( newData, oldData, checkTypes(newData) , checkTypes(oldData) )
     if ( 
         ( newData instanceof Object || oldData instanceof Object ) &&
         checkTypes(newData) !== checkTypes(oldData)  
@@ -202,7 +196,7 @@ class Obs {
             bindObs( this, this.data, k, newObject[k] )
             nV.push( this[k] )
         })
-        console.log ( newObject, nV )
+        // console.log ( newObject, nV )
         this.domtree.map( v => v( 1, nV ) )
     }
 
@@ -222,9 +216,9 @@ class Obs {
     }
 
     remove() {
-        console.log (this.domtree)
         this.__get = undefined
         this.domtree.map( v => v( 2 ) )
+        this.attrtree.map( v => v( 2 ) )
     }
 
     map( fun ) {
