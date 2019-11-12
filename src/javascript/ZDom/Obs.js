@@ -144,7 +144,21 @@ class Obs {
 
     replace ( newOnObject ) {
         this.__get = newOnObject
-        this.domtree.map( v => v(3, this) )
+
+        const domtree = [...this.domtree]
+        const attrtree = [...this.attrtree]
+        const watch = [...this.watch]
+        this.domtree.length = 0
+        // this.attrtree.length = 0
+        // this.watch.length = 0
+
+        domtree.map( v => v(3, this) );
+        attrtree.map( v => v());
+        watch.map( v => v(newOnObject) );
+        // 非对象类型重置时会重新渲染，push domtree
+        // if ( !( newValue instanceof Object) ) return
+        // this.domtree.push(...domtree)
+        this.watch.push(...watch)
     }
 
     add ( newObject ) {

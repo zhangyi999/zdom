@@ -12,7 +12,7 @@ function addList( ) {
 }
 
 function reloadeArr(){
-    this.data.date = i++
+    this.date.replace(i++)
     this.data.list = [{a:1}]
 }
  
@@ -59,7 +59,7 @@ function Index() {
             // dom.h2({},'this is demo'),
             dom.div({}, 
                 // dom.h4({},'time'),
-                // dom.p({}, $.date )
+                dom.p({}, $.date )
             ),
             dom.div({}, 
                 // dom.h4({},'list'),
