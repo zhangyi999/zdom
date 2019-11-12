@@ -112,7 +112,6 @@ class Obs {
             // 非对象类型重置时会重新渲染，push domtree
             if ( !( newValue instanceof Object) ) return
             this.domtree.push(...domtree)
-            // this.attrtree.push(...attrtree)
             this.watch.push(...watch)
         })
         this.init( valueAny )
@@ -184,11 +183,15 @@ class Obs {
 
     render( newValue = this.__get ) {
         // if ( this.renders.length === 0 ) return newValue
-
         if ( newValue instanceof Array ) return this.renderArray( newValue )
-        if ( newValue instanceof Object ) {
+        if ( newValue instanceof Object || newValue instanceof Obs ) {
             // if ( typeof newValue.__get !== 'object' ) return [this.renderValue ( newValue, 0 )]
-            if ( newValue.__get instanceof Element || newValue.__get instanceof Text || newValue.__get instanceof DocumentFragment ) return [this.renderValue ( newValue.__get, 0 )] 
+            if ( 
+                newValue.__get instanceof Element || 
+                newValue.__get instanceof Text || 
+                newValue.__get instanceof DocumentFragment 
+            ) return [this.renderValue ( newValue.__get, 0 )] 
+            if ( Object.keys(newValue).length === 0 ) return [this.renderValue ( newValue, 0 )]
             const data = []
             ObjectMap( newValue, ( v, k ) => {
                 data.push(this.renderValue ( this[k], k ))

@@ -36,6 +36,7 @@ function Index() {
             // 3,
             // 5,
             // {a:'true'},
+            // false,
             {a:false},
             // {a:true},
             // {a:true}
@@ -62,7 +63,7 @@ function Index() {
             ),
             dom.div({}, 
                 // dom.h4({},'list'),
-                // dom.p({}, $.date ),
+                dom.p({}, $.list[0].a ),
                 dom.p({}, $.list.map( v => {
                     console.log ( v, 'vvvvv' )
                     return dom.input({type: 'checkbox',checked:v.a || v, class: v.a || v }) 
