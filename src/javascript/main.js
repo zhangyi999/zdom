@@ -1,143 +1,124 @@
-import dom,{
-    Commponent,
-    Observable,
-    ObjectMap,
-    getPageData
-} from './ZDom'
 
-import './init.css'
+import dom,{Obs, Commponent} from './ZDom'
 
-// 组件
-function header( ...child ) {
-    return (
-        dom.h1({class: 'z_dom_header'}, child )
+/**
+    bug
+    1 map 函数v只能用 获取 最底层数据 
+ */ 
+let i = 0
+function addList( ) {
+    this.list.push([{a:99}])
+    console.log  ( this )
+}
+
+function reloadeArr(){
+    this.data.date  = i++
+    console.log ( this.data.list)
+    this.data.list = [{a:i++}]
+}
+ 
+function chengeArr4(){
+    // console.log ( this.data.list[6], this, this.deepLisst )
+    // this.list[6].__set({a:('sdffff')}) // 
+    // this.data.list[6].a = (dom.b({},'this is 4'))
+    // this.data.deepLisst[0] = ({a:{b:'33333'}})
+
+    console.log ( this.data.list )
+    this.data.list[0].a = !this.data.list[0].a
+    this.data.list[2].a = !this.data.list[2].a
+    console.log(
+        this.list[0]
     )
 }
-const Header = Commponent(header)
 
-// 数据绑定
-function content( ) {
-    const times = this.data('time', new Date().Format('yy.MM.dd hh:mm:ss'))
-    // this.loaded = () => {
-    //     setInterval(()=>{
-    //         this.data.time = new Date().Format('yy.MM.dd hh:mm:ss')
-    //     },1000)
-    // }
+function Test( ...child ) {
+    // const dk = new Obs({k: 'sdffssd'})
+    // console.log ( this)
+    // setTimeout(() => {
+    //     dk.data.k = 123312
+    //     this.props.a = 21332213 
+    // }, 4000);
     return (
-        dom.div({class: 'z_dom_content'},
-            dom.p({},'the time now'),
-            dom.h2({}, times )
-        )
+        dom.div({class: 'dk.k'}, this.a || '')
     )
 }
-const Content = Commponent(content)
 
-// 组件套用
-function childCommponent( ) {
-    return (
-        dom.div({
-            class: [ this.data.class , ' <l' ]
-        },
-            dom.p({},'this is childCommponent')
-        )
-    )
-}
-const ChildCommponent = Commponent(childCommponent)
-function sssssss() {
-    this.data.kk = [1,3,2]
+const TestCommpent = Commponent(Test)
 
-    console.log ( this.data.kk)
-}
-function prantCommponent( ...child ) {
-    const kk = this.data('kk',0x00312312)
-    return (
-        dom.div({
-            class : [ this.data.class , ' z_dom_prantcommponent ']
-        },
-            dom.p({},'this is PrantCommponent'),
-            ChildCommponent({
-                class: [ this.data.class , ' <z']
-            }),
-            child,
-            dom.div({},
-                kk
-                // this.data.list.mapA( v => dom.p({},
-                //     dom.b({},v.b),
-                //     dom.span({},v.s)
-                // ))
-            ),
-            dom.a({
-                '@click': sssssss.bind(this)
-            },'ddddddddd-----ddddd')
-        )
-    )
-}
-const PrantCommponent = Commponent(prantCommponent)
-
-const statics = Observable();
-const arr = Observable()
-var a = '111'
 function Index() {
-    const lii = [ true, false ]
-    
-    const {
-        img,
-        list,
-        kk
-    } = statics.data({
-        img: 'a',
-        list: arr.data(lii),
-        kk: [1,3,2]
+    const $ = new Obs({
+        date: '--',
+        list: [
+            // 1,
+            // 3,
+            // 5,
+            // {a:'true'},
+            // false,
+            {a:false},
+            {a:true},
+            // {a:true}
+        ],
+        // deepLisst: [
+        //     {a:{
+        //         b:'12133'
+        //     }}
+        // ]
     })
-    // console.log(img)
+    let i = 0
+    console.log ( $ )
+    // const k =  setInterval(() => {
+    //     i ++
+    //     console.log ( $ )
+    //     $.data.date = new Date().Format('yyyy.MM.dd hh:mm:ss')
+    //     i > 6? clearInterval(k):''
+    // }, 1000);
     return (
-        dom.div({class:'z_dom_index'},
-            // Header({},'hello word!'),
-            // Content({list}),
-            PrantCommponent({ 
-                class: [ statics.data('pantent','a') ],
-                list
-            }),
-            dom.img({src: [ './static/img/',img,'.jpg' ] }),
-            dom.a({
-                '@click': change
-            },'修改 arr'),
-            dom.a({
-                '@click': change1.bind(this)
-            },'修改 0'),
-            dom.h1({$innerHTML: [ '<p>', img, '</p>']}),
-            list.mapA( v => {
-                return dom.input({
-                    type: 'checkbox',
-                    checked: v 
-                } )
-            }),
-            dom.div({},kk)
+        dom.div({},
+            // dom.h2({},'this is demo'),
+            dom.div({}, 
+                // dom.h4({},'time'),
+                // dom.p({}, $.date )
+            ),
+            dom.div({}, 
+                // dom.h4({},'list'),
+                // TestCommpent({a:$.date}),
+                dom.p({}, $.list[0].a ),
+                dom.p({}, $.list.map( v => {
+                    console.log ( v, 'vvvssss' )
+                    return TestCommpent({a:v.a.map(v => {
+                        console.log ( v, 'vvvssss1' )
+                        return v 
+                    })}) 
+                    // return dom.input({class:v.a,checked: v.a, type:'checkbox'})
+                }) )
+            ),
+            // dom.div({}, 
+            //     dom.h4({},'list'),
+            //     // dom.p({}, $.deepLisst.map( v => {
+            //     //     console.log ( v ,'cccssss')
+            //     //     return dom.p({}, v.b )
+            //     // }) ),
+            //     // dom.p({}, $.list.map( v => dom.p({}, v.a || v)) )
+            // ),
+            
+            dom.p({},
+                dom.a({
+                    '@click': addList.bind( $ )
+                },'加长列表')
+            ),
+            dom.p({},
+                dom.a({
+                    '@click': reloadeArr.bind( $ )
+                },'重置')
+            ),
+            dom.p({},
+                dom.a({
+                    '@click': chengeArr4.bind( $ )
+                },'修改')
+            )
+            
         )
     )
 }
-
-function change1() {
-    statics.data.list.replace(1,[true])
-}
-
-function change() {
-    statics.data.img = 'g'
-
-    statics.data.list = [
-        {b:1,s:3},
-        {b:1,s:5},
-        {b:1,s:4}
-    ]
-    // console.log(statics.data.pantent)
-
-    // console.log([statics.data.list])
-}
-
-setTimeout(()=>{
-    a  = '22222'
-    arr.data[1] = true
-    console.log(statics.data.l2 == true)
-},5000)
 
 document.getElementById('app').appendChild(Index())
