@@ -3,13 +3,7 @@ import dom,{Obs, Commponent} from './ZDom'
 
 /**
     bug
-    1 map 函数v只能用 获取 最底层数据 
-    2 数组 初始化时 渲染错误
-    3 diff 算法 无法处理 被删除的元素 恢复到原位
-
-    主要问题是 Obs 的 render 函数
-    流程应该是 domtree 保存 renders ，渲染时 传入 render
-    数组 render 需要遍历自身 
+    2 map 函数中的 Obs 对象 被删除后 无法 恢复，主要需要处理 {} map 中的方法
  */ 
 let i = 0
 function addList( ) {
@@ -54,16 +48,7 @@ const TestCommpent = Commponent(Test)
 function Index() {
     const $ = new Obs({
         date: '--',
-        list: [
-            // 1,
-            // 3,
-            // 5,
-            // {a:'true'},
-            // false,
-            {a:false},
-            {a:true},
-            // {a:true}
-        ],
+        list: [ dom.p({}, 'load')],
         // deepLisst: [
         //     {a:{
         //         b:'12133'
@@ -91,6 +76,7 @@ function Index() {
                 // dom.p({}, $.list[0].a ),
                 dom.p({}, $.list.map( (v,i) => {
                     // console.log ( v, i, 'vvvssss' )
+                    if ( v.a === undefined ) return v
                     return TestCommpent({a:v.a.map(v => {
                         console.log ( v, 'vvvssss1' )
                         return v 

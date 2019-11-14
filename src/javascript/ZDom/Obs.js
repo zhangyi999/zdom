@@ -19,12 +19,24 @@ function Observable( obj, key, obs ) {
 
 function isDiff( newData, oldObs ) {
     const oldData = oldObs.__get
-    // console.log ( newData, oldData, checkTypes(newData) , checkTypes(oldData) )
-    if ( 
-        ( newData instanceof Object || oldData instanceof Object ) &&
-        checkTypes(newData) !== checkTypes(oldData)  
-    ) throw '值为对象时，不可改变值得类型'
     if ( newData === oldData ) return false
+    if ( checkTypes(newData) !== checkTypes(oldData) ) {
+        // console.log ( newData, oldData, checkTypes(newData) , checkTypes(oldData) ,oldObs)
+        Object.keys(oldObs).map (v => {
+            oldObs[v].remove()
+            delete oldObs[v]
+            delete oldObs[v].data[v]
+        })
+        
+        if ( ( newData instanceof Object) ) oldObs.init( newData )
+        oldObs.replace(newData)
+        return false
+    }
+
+    // if ( 
+    //     ( newData instanceof Object || oldData instanceof Object ) &&
+    //     checkTypes(newData) !== checkTypes(oldData)  
+    // ) throw '值为对象时，不可改变值得类型'
     if ( newData instanceof Object ) {
         const newValueArr = {}
         // console.log  ( newData )
@@ -33,13 +45,14 @@ function isDiff( newData, oldObs ) {
                 newValueArr[k] = v
             } else {
                 // 0.3 只考虑 [{}] 一层状态，哈哈，能力有限，请见谅
-                if ( v instanceof Object ) {
-                    ObjectMap( v, (v, k1) => {
-                        isDiff( v, oldObs[k][k1] )
-                    })
-                } else {
-                    isDiff( v, oldObs[k] )
-                }
+                // if ( v instanceof Object ) {
+                //     ObjectMap( v, (v, k1) => {
+                //         isDiff( v, oldObs[k][k1] )
+                //     })
+                // } else {
+                //     isDiff( v, oldObs[k] )
+                // }
+                isDiff( v, oldObs[k] )
             }
         })
         ObjectMap( oldData, (v,k) => {
@@ -49,7 +62,7 @@ function isDiff( newData, oldObs ) {
                 //     delete oldObs[k][v]
                 //     delete oldObs.data[k]
                 // })
-                console.log ( k, oldObs )
+                // console.log ( k, oldObs )
                 oldObs[k].remove()
                 delete oldObs[k]
                 delete oldObs.data[k]
