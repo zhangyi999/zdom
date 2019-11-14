@@ -4,6 +4,12 @@ import dom,{Obs, Commponent} from './ZDom'
 /**
     bug
     1 map 函数v只能用 获取 最底层数据 
+    2 数组 初始化时 渲染错误
+    3 diff 算法 无法处理 被删除的元素 恢复到原位
+
+    主要问题是 Obs 的 render 函数
+    流程应该是 domtree 保存 renders ，渲染时 传入 render
+    数组 render 需要遍历自身 
  */ 
 let i = 0
 function addList( ) {
