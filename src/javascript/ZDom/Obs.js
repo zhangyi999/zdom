@@ -19,7 +19,6 @@ function Observable( obj, key, obs ) {
 
 function isDiff( newData, oldObs ) {
     const oldData = oldObs.__get
-    debugger
     // console.log ( newData, oldData, checkTypes(newData) , checkTypes(oldData) )
     if ( 
         ( newData instanceof Object || oldData instanceof Object ) &&
@@ -172,7 +171,7 @@ class Obs {
         const domtree = [...this.domtree]
         const attrtree = [...this.attrtree]
         const watch = [...this.watch]
-        this.domtree.length = 0
+        // this.domtree.length = 0
         // this.attrtree.length = 0
         // this.watch.length = 0
 
@@ -269,10 +268,7 @@ class Obs {
         if ( newValue instanceof Object ) {
             return this.renderValue( renderFunArray, newValue, null )
         }
-
-        
-
-        return newValue 
+        return this.renderValue( renderFunArray, newValue, null ) 
     }
 }
 

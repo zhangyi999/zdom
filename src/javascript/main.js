@@ -33,7 +33,7 @@ function chengeArr4(){
     this.data.list[0].a = !this.data.list[0].a
     this.data.list[2].a = !this.data.list[2].a
     console.log(
-        this.list[0]
+        this.list[0].a ,'sdfsdfds'
     )
 }
 
