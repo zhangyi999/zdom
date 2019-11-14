@@ -45,7 +45,7 @@ function Test( ...child ) {
     //     this.props.a = 21332213 
     // }, 4000);
     return (
-        dom.div({class: 'dk.k'}, this.a || '')
+        dom.div({class: 'dk.k'}, this.a)
     )
 }
 
@@ -88,14 +88,14 @@ function Index() {
             dom.div({}, 
                 // dom.h4({},'list'),
                 // TestCommpent({a:$.date}),
-                dom.p({}, $.list[0].a ),
-                dom.p({}, $.list.map( v => {
-                    console.log ( v, 'vvvssss' )
+                // dom.p({}, $.list[0].a ),
+                dom.p({}, $.list.map( (v,i) => {
+                    // console.log ( v, i, 'vvvssss' )
                     return TestCommpent({a:v.a.map(v => {
                         console.log ( v, 'vvvssss1' )
                         return v 
                     })}) 
-                    // return dom.input({class:v.a,checked: v.a, type:'checkbox'})
+                    return dom.input({class:v.a,checked: v.a, type:'checkbox'})
                 }) )
             ),
             // dom.div({}, 

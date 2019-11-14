@@ -19,6 +19,7 @@ function Observable( obj, key, obs ) {
 
 function isDiff( newData, oldObs ) {
     const oldData = oldObs.__get
+    debugger
     // console.log ( newData, oldData, checkTypes(newData) , checkTypes(oldData) )
     if ( 
         ( newData instanceof Object || oldData instanceof Object ) &&
@@ -89,23 +90,14 @@ function addPorto(obj, key, val, {enumerable, configurable, writable} = {}) {
 
 function bindObs( obsDomObj, obsObj, key, value ) {
     Observable( obsObj, key, obsDomObj )
-    // if ( value instanceof Array ) {
-    //     obsDomObj[key] = new Obs(value)
-    //     value.map( (v,i) => {
-    //         bindObs( obsDomObj[key], obsObj[key], i, v )
-    //     })
-    //     return
-    // }
     if ( value instanceof Object ) {
         obsDomObj[key] = new Obs(value)
-        // Observable( obsDataObj, key, obsDomObj , value )
         ObjectMap( value,  (v,i) => {
             bindObs( obsDomObj[key], obsObj[key], i, v )
         })
         return
     }
     obsDomObj[key] = new Obs(value)
-    // Observable( obsObj, key, obsDomObj ) 
 }
 
 // 数据绑定最小单位
@@ -200,6 +192,7 @@ class Obs {
             bindObs( this, this.data, k, newObject[k] )
             nV.push( this[k] )
         })
+        if ( nV.length == 0 ) return
         this.domtree.map( v => v(  typeAdd, nV ) )
     }
 
@@ -254,25 +247,32 @@ class Obs {
 
     render( newValue, renderFunArray ) {
         // if ( this.renders.length === 0 ) return newValue
+        if ( newValue instanceof Obs ) {
+            const value = newValue.__get
+            if ( Object.keys(newValue).length === 0 ) {
+                return this.renderValue( renderFunArray, value, null )
+            }
+            else if ( value instanceof Array ) {
+                // index 参数在 添加数组时 可能会出现重复
+
+                return value.map( (v, i) => this.renderValue(renderFunArray, newValue[i], i))
+            }
+            else if ( value instanceof Object  ) {
+                return this.renderValue( renderFunArray, this, null )
+            }
+        }
+
         if ( newValue instanceof Array ) {
             return newValue.map( (v, i) => this.renderValue(renderFunArray, v, i))
         }
 
         if ( newValue instanceof Object ) {
-            return this.renderValue( renderFunArray, v, null )
+            return this.renderValue( renderFunArray, newValue, null )
         }
 
-        if ( newValue instanceof Obs ) {
-            const value = newValue.__get
-            if ( Object.keys(newValue).length === 0 || value instanceof Object ) {
-                return this.renderValue( renderFunArray, v, null )
-            } else if ( value instanceof Array ) {
-                // index 参数在 添加数组时 可能会出现重复
-                return newValue.map( (v, i) => this.renderValue(renderFunArray, v, i))
-            }
-        }
+        
 
-        return this.renderValue( renderFunArray, v, null )
+        return newValue 
     }
 }
 
