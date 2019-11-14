@@ -19,7 +19,7 @@ const ArrayElement = [
         // 从头部增加
         const addElement = creatDocumentFragment(newArray);
         const indexEl = oldRepalce[0];
-        prant = indexEl.parentElement || prant
+        prant = (oldRepalce[0] || {}).parentElement || prant
         oldRepalce.unshift( ...Array.from( addElement.childNodes ) );
         prant.insertBefore( addElement, indexEl );
         return oldRepalce;
@@ -28,7 +28,7 @@ const ArrayElement = [
         // 从尾部增加
         const addElement = creatDocumentFragment(newArray);
         const newPr = oldRepalce.concat( Array.from( addElement.childNodes ));
-        prant = oldRepalce[0].parentElement || prant
+        prant = (oldRepalce[0] || {}).parentElement || prant
         addElemens(prant, addElement,oldRepalce[oldRepalce.length -1] )
         return newPr
     },
@@ -45,7 +45,7 @@ const ArrayElement = [
         // console.log ( [oldRepalce], newArray, 'newArraynewArraynewArray' )
         const addElement = creatDocumentFragment(newArray);
         const oldDom = oldRepalce[0]
-        prant = oldDom.parentElement || prant
+        prant = (oldRepalce[0] || {}).parentElement || prant
         const len = oldRepalce.length
         for ( let i = 1; i < len; i ++ ) {
             oldRepalce[i].ondie?oldRepalce[i].ondie():'';
@@ -59,25 +59,31 @@ const ArrayElement = [
     }
 ]
 
+
 // domtree: 0 | 从头部增加，1 | 从尾部增加， 2 | 删除，3 | 替换  
-function replaceDom( type, prant, oldDom, obs, newValue ) {
+function replaceDom( type, prant, oldDom, obs, newValue, renders ) {
     // console.log (obs, newValue,'newValuenewValuenewValue1-----' )
-    const newDom = obs.render( newValue )
-    const renders = [...obs.renders]
+    // 仅考虑单层数组，对象 直接渲染，不用遍历
+    
+    // const kk = obs.render( newValue, renders )
+    const fragment = type === 3 ? obs.render( newValue, renders ) : document.createDocumentFragment()
+    // debugger
     if ( type === 0 || type === 1 ) {
-        newValue.map( v => {
-            v.domtree.push((type, newValue) => {
-                v.renders.push(...renders)
-                // console.log( newValue )
+        const len = Object.keys(obs).length
+        // debugger
+        newValue.map( (v, i) => {
+            i = len+i - 1
+            addChild ( fragment, obs[i].render( obs[i], renders.map( v => (v1,i1) => v(v1, i) )) )
+            let oldDom = Array.from( fragment.childNodes )
+            obs[i].domtree.push((type, newValue) => {
                 // bug 老节点
                 // console.log ( obs, newValue, ' obsobsobs' )
-                oldDom = replaceDom( type, prant, newDom, v, newValue )
-                v.renders.length = 0
+                oldDom = replaceDom( type, fragment, oldDom, obs[len+i], newValue, renders )
             })
         })
     }
-    //  console.log ( newDom, newValue,'newValuenewValuenewValue' )
-    return ArrayElement[type]( prant, oldDom, newDom, newValue )
+    // debugger
+    return ArrayElement[type]( prant, oldDom, fragment, newValue )
 }
 
 
@@ -86,59 +92,30 @@ function addObsDom( prant, obs ) {
     // 仅考虑单层数组，对象 直接渲染，不用遍历
     const fragment = document.createDocumentFragment()
     const renders = [...obs.renders]
-
+    obs.renders.length = 0
     if ( obs.__get instanceof Array ) {
-        obs.__get.map((v,k) => {
-            // 数组子元素继承 数组的 渲染 模式
-            // if ( v instanceof Obs ){
-                obs[k].renders.push(...renders)
-            // }            
-            addChild ( fragment, obs[k] )
-            console.log (
-                fragment.childNodes, 
-                [fragment.childNodes[k].parentElement],
-                obs,
-                'childNodeschildNodeschildNodes' 
-            )
-            // obs.domtree.push((type, newValue) => {
-            //     obs.renders.push(...renders)
-            //     // console.log( newValue )
-            //     // bug 老节点
-            //     // console.log ( obs, newValue, ' obsobsobs' )
-            //     oldDom = replaceDom( type, prant, oldDom, obs, newValue )
-            //     obs.renders.length = 0
-            // })
-            // obs.renders.length = 0
+        obs.__get.map( (v, i) => {
+            const fragment1 = document.createDocumentFragment()
+            addChild ( fragment1, obs[i].render( obs[i], renders ))
+            let oldDom = Array.from( fragment1.childNodes )
+            obs[i].domtree.push((type, newValue) => {
+                // bug 老节点
+                // console.log ( obs, newValue, ' obsobsobs' )
+                oldDom = replaceDom( type, fragment1, oldDom, obs[i], newValue, renders )
+            })
+            fragment.appendChild( fragment1 )
         })
-        
-    } 
-    // else if  ( obs.__get instanceof Object ) {
-    //     ObjectMap( obs.__get, (v,k) => {
-    //         // 数组子元素继承 数组的 渲染 模式
-    //         // if ( v instanceof Obs ){
-    //         //     obs[k].renders.push(...renders)
-    //         // }            
-    //         addChild ( fragment, obs[k] )
-    //     })
-    // } 
-    else {
-        addChild ( fragment, obs.render( ))
-    } 
-    // const ddf = obs.render()
-    // addChild ( fragment, ddf )
-    
+    } else addChild ( fragment, obs.render( obs, renders ))
     let oldDom = Array.from( fragment.childNodes )
     prant.appendChild( fragment )
-    console.log( obs , fragment, 'obsobsobsobsobsobsobsobs' )
+    // console.log( obs , fragment, 'obsobsobsobsobsobsobsobs' )
+    // debugger
     obs.domtree.push((type, newValue) => {
-        obs.renders.push(...renders)
-        // console.log( newValue )
         // bug 老节点
         // console.log ( obs, newValue, ' obsobsobs' )
-        oldDom = replaceDom( type, prant, oldDom, obs, newValue )
-        obs.renders.length = 0
+        oldDom = replaceDom( type, prant, oldDom, obs, newValue, renders )
     })
-    obs.renders.length = 0
+    
 }
 
 function creatDocumentFragment(childs) {

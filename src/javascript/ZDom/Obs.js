@@ -19,12 +19,24 @@ function Observable( obj, key, obs ) {
 
 function isDiff( newData, oldObs ) {
     const oldData = oldObs.__get
-    // console.log ( newData, oldData, checkTypes(newData) , checkTypes(oldData) )
-    if ( 
-        ( newData instanceof Object || oldData instanceof Object ) &&
-        checkTypes(newData) !== checkTypes(oldData)  
-    ) throw '值为对象时，不可改变值得类型'
     if ( newData === oldData ) return false
+    if ( checkTypes(newData) !== checkTypes(oldData) ) {
+        // console.log ( newData, oldData, checkTypes(newData) , checkTypes(oldData) ,oldObs)
+        Object.keys(oldObs).map (v => {
+            oldObs[v].remove()
+            delete oldObs[v]
+            delete oldObs[v].data[v]
+        })
+        
+        if ( ( newData instanceof Object) ) oldObs.init( newData )
+        oldObs.replace(newData)
+        return false
+    }
+
+    // if ( 
+    //     ( newData instanceof Object || oldData instanceof Object ) &&
+    //     checkTypes(newData) !== checkTypes(oldData)  
+    // ) throw '值为对象时，不可改变值得类型'
     if ( newData instanceof Object ) {
         const newValueArr = {}
         // console.log  ( newData )
@@ -33,13 +45,14 @@ function isDiff( newData, oldObs ) {
                 newValueArr[k] = v
             } else {
                 // 0.3 只考虑 [{}] 一层状态，哈哈，能力有限，请见谅
-                if ( v instanceof Object ) {
-                    ObjectMap( v, (v, k1) => {
-                        isDiff( v, oldObs[k][k1] )
-                    })
-                } else {
-                    isDiff( v, oldObs[k] )
-                }
+                // if ( v instanceof Object ) {
+                //     ObjectMap( v, (v, k1) => {
+                //         isDiff( v, oldObs[k][k1] )
+                //     })
+                // } else {
+                //     isDiff( v, oldObs[k] )
+                // }
+                isDiff( v, oldObs[k] )
             }
         })
         ObjectMap( oldData, (v,k) => {
@@ -49,7 +62,7 @@ function isDiff( newData, oldObs ) {
                 //     delete oldObs[k][v]
                 //     delete oldObs.data[k]
                 // })
-                console.log ( k, oldObs )
+                // console.log ( k, oldObs )
                 oldObs[k].remove()
                 delete oldObs[k]
                 delete oldObs.data[k]
@@ -89,23 +102,14 @@ function addPorto(obj, key, val, {enumerable, configurable, writable} = {}) {
 
 function bindObs( obsDomObj, obsObj, key, value ) {
     Observable( obsObj, key, obsDomObj )
-    // if ( value instanceof Array ) {
-    //     obsDomObj[key] = new Obs(value)
-    //     value.map( (v,i) => {
-    //         bindObs( obsDomObj[key], obsObj[key], i, v )
-    //     })
-    //     return
-    // }
     if ( value instanceof Object ) {
         obsDomObj[key] = new Obs(value)
-        // Observable( obsDataObj, key, obsDomObj , value )
         ObjectMap( value,  (v,i) => {
             bindObs( obsDomObj[key], obsObj[key], i, v )
         })
         return
     }
     obsDomObj[key] = new Obs(value)
-    // Observable( obsObj, key, obsDomObj ) 
 }
 
 // 数据绑定最小单位
@@ -180,7 +184,7 @@ class Obs {
         const domtree = [...this.domtree]
         const attrtree = [...this.attrtree]
         const watch = [...this.watch]
-        this.domtree.length = 0
+        // this.domtree.length = 0
         // this.attrtree.length = 0
         // this.watch.length = 0
 
@@ -200,6 +204,7 @@ class Obs {
             bindObs( this, this.data, k, newObject[k] )
             nV.push( this[k] )
         })
+        if ( nV.length == 0 ) return
         this.domtree.map( v => v(  typeAdd, nV ) )
     }
 
@@ -240,37 +245,43 @@ class Obs {
         return this
     }
 
-    renderValue ( v, i ) {
+    renderValue (fnArray, v, i ) {
         let prvValue = v;
-        this.renders.map( fn => {
+        fnArray.map( fn => {
             if ( prvValue !== undefined ) prvValue = fn( prvValue, i )
         })
-        console.log ( v,prvValue, i,'dsfsdfs' )
         return prvValue
     }
 
-    renderArray ( newValue ) {
-        return newValue.map( (v,i) => this.renderValue ( v, i ))
-    }
+    // renderArray ( newValue ) {
+    //     return newValue.map( (v,i) => this.renderValue ( v, i ))
+    // }
 
-    render( newValue = this.__get ) {
+    render( newValue, renderFunArray ) {
         // if ( this.renders.length === 0 ) return newValue
-        if ( newValue instanceof Array ) return this.renderArray( newValue )
-        if ( newValue instanceof Object || newValue instanceof Obs ) {
-            // if ( typeof newValue.__get !== 'object' ) return [this.renderValue ( newValue, 0 )]
-            if ( 
-                newValue.__get instanceof Element || 
-                newValue.__get instanceof Text || 
-                newValue.__get instanceof DocumentFragment ||
-                Object.keys(newValue).length === 0 
-            ) return [this.renderValue ( newValue, 0 )]
-            // const data = []
-            // ObjectMap( newValue, ( v, k ) => {
-            //     data.push(this.renderValue ( this[k], k ))
-            // })
-            return [this.renderValue ( this, 0 )]
+        if ( newValue instanceof Obs ) {
+            const value = newValue.__get
+            if ( Object.keys(newValue).length === 0 ) {
+                return this.renderValue( renderFunArray, value, null )
+            }
+            else if ( value instanceof Array ) {
+                // index 参数在 添加数组时 可能会出现重复
+
+                return value.map( (v, i) => this.renderValue(renderFunArray, newValue[i], i))
+            }
+            else if ( value instanceof Object  ) {
+                return this.renderValue( renderFunArray, this, null )
+            }
         }
-        return this.renderValue ( newValue )
+
+        if ( newValue instanceof Array ) {
+            return newValue.map( (v, i) => this.renderValue(renderFunArray, v, i))
+        }
+
+        if ( newValue instanceof Object ) {
+            return this.renderValue( renderFunArray, newValue, null )
+        }
+        return this.renderValue( renderFunArray, newValue, null ) 
     }
 }
 

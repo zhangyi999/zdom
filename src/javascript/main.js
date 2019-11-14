@@ -3,7 +3,7 @@ import dom,{Obs, Commponent} from './ZDom'
 
 /**
     bug
-    1 map 函数v只能用 获取 最底层数据 
+    2 map 函数中的 Obs 对象 被删除后 无法 恢复，主要需要处理 {} map 中的方法
  */ 
 let i = 0
 function addList( ) {
@@ -27,7 +27,7 @@ function chengeArr4(){
     this.data.list[0].a = !this.data.list[0].a
     this.data.list[2].a = !this.data.list[2].a
     console.log(
-        this.list[0]
+        this.list[0].a ,'sdfsdfds'
     )
 }
 
@@ -39,7 +39,7 @@ function Test( ...child ) {
     //     this.props.a = 21332213 
     // }, 4000);
     return (
-        dom.div({class: 'dk.k'}, this.a || '')
+        dom.div({class: 'dk.k'}, this.a)
     )
 }
 
@@ -48,16 +48,7 @@ const TestCommpent = Commponent(Test)
 function Index() {
     const $ = new Obs({
         date: '--',
-        list: [
-            // 1,
-            // 3,
-            // 5,
-            // {a:'true'},
-            // false,
-            {a:false},
-            {a:true},
-            // {a:true}
-        ],
+        list: [ dom.p({}, 'load')],
         // deepLisst: [
         //     {a:{
         //         b:'12133'
@@ -82,14 +73,15 @@ function Index() {
             dom.div({}, 
                 // dom.h4({},'list'),
                 // TestCommpent({a:$.date}),
-                dom.p({}, $.list[0].a ),
-                dom.p({}, $.list.map( v => {
-                    console.log ( v, 'vvvssss' )
+                // dom.p({}, $.list[0].a ),
+                dom.p({}, $.list.map( (v,i) => {
+                    // console.log ( v, i, 'vvvssss' )
+                    if ( v.a === undefined ) return v
                     return TestCommpent({a:v.a.map(v => {
                         console.log ( v, 'vvvssss1' )
                         return v 
                     })}) 
-                    // return dom.input({class:v.a,checked: v.a, type:'checkbox'})
+                    return dom.input({class:v.a,checked: v.a, type:'checkbox'})
                 }) )
             ),
             // dom.div({}, 
