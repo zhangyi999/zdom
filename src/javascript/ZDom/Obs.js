@@ -240,37 +240,39 @@ class Obs {
         return this
     }
 
-    renderValue ( v, i ) {
+    renderValue (fnArray, v, i ) {
         let prvValue = v;
-        this.renders.map( fn => {
+        fnArray.map( fn => {
             if ( prvValue !== undefined ) prvValue = fn( prvValue, i )
         })
-        console.log ( v,prvValue, i,'dsfsdfs' )
         return prvValue
     }
 
-    renderArray ( newValue ) {
-        return newValue.map( (v,i) => this.renderValue ( v, i ))
-    }
+    // renderArray ( newValue ) {
+    //     return newValue.map( (v,i) => this.renderValue ( v, i ))
+    // }
 
-    render( newValue = this.__get ) {
+    render( newValue, renderFunArray ) {
         // if ( this.renders.length === 0 ) return newValue
-        if ( newValue instanceof Array ) return this.renderArray( newValue )
-        if ( newValue instanceof Object || newValue instanceof Obs ) {
-            // if ( typeof newValue.__get !== 'object' ) return [this.renderValue ( newValue, 0 )]
-            if ( 
-                newValue.__get instanceof Element || 
-                newValue.__get instanceof Text || 
-                newValue.__get instanceof DocumentFragment ||
-                Object.keys(newValue).length === 0 
-            ) return [this.renderValue ( newValue, 0 )]
-            // const data = []
-            // ObjectMap( newValue, ( v, k ) => {
-            //     data.push(this.renderValue ( this[k], k ))
-            // })
-            return [this.renderValue ( this, 0 )]
+        if ( newValue instanceof Array ) {
+            return newValue.map( (v, i) => this.renderValue(renderFunArray, v, i))
         }
-        return this.renderValue ( newValue )
+
+        if ( newValue instanceof Object ) {
+            return this.renderValue( renderFunArray, v, null )
+        }
+
+        if ( newValue instanceof Obs ) {
+            const value = newValue.__get
+            if ( Object.keys(newValue).length === 0 || value instanceof Object ) {
+                return this.renderValue( renderFunArray, v, null )
+            } else if ( value instanceof Array ) {
+                // index 参数在 添加数组时 可能会出现重复
+                return newValue.map( (v, i) => this.renderValue(renderFunArray, v, i))
+            }
+        }
+
+        return this.renderValue( renderFunArray, v, null )
     }
 }
 
