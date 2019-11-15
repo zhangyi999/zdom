@@ -15,6 +15,17 @@ function Observable( obj, key, obs ) {
     return obj
 }
 
+class Render {
+	constructor(fn, Obs) {
+		this.renders = [fn]
+		this.Obs = Obs
+	}
+	map(fn) {
+		this.renders.push(fn)
+		return this
+	}
+}
+
 // return ture is diff status
 
 function isDiff( newData, oldObs ) {
@@ -192,8 +203,7 @@ class Obs {
     }
 
     map( fun ) {
-        this.renders.push(fun)
-        return this
+        return new Render(fun, this)
     }
 
     renderValue (fnArray, v, i ) {
@@ -239,6 +249,7 @@ class Obs {
 export default Obs
 
 export {
-    addPorto
+    addPorto,
+    Render
 }
 

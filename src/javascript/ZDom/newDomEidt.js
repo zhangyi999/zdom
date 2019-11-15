@@ -1,6 +1,6 @@
 import DomPrototype from './dom'
 
-import Obs from './Obs'
+import Obs, {Render} from './Obs'
 
 import {ObjectMap} from './public'
 
@@ -91,8 +91,9 @@ function replaceDom( type, prant, oldDom, obs, newValue, renders ) {
 function addObsDom( prant, obs ) {
     // 仅考虑单层数组，对象 直接渲染，不用遍历
     const fragment = document.createDocumentFragment()
+
     const renders = [...obs.renders]
-    obs.renders.length = 0
+    obs = obs instanceof Render ? obs.Obs : obs
     if ( obs.__get instanceof Array ) {
         obs.__get.map( (v, i) => {
             const fragment1 = document.createDocumentFragment()
@@ -126,7 +127,7 @@ function creatDocumentFragment(childs) {
 
 function addChild ( prant, childs ) {
     if ( childs === undefined ) return ''
-    if ( childs instanceof Obs ) {
+    if ( childs instanceof Obs || childs instanceof Render ) {
         addObsDom( prant, childs )
     } else if ( childs instanceof Array ) {
         const len =  childs.length;
@@ -157,7 +158,10 @@ function setAttribute(dom, key, attrs) {
 function supplementArray( arr, arrRender ) {
     let supplement = ''
     arr.map( (v = '', i ) => {
-        supplement += v instanceof Obs ? v.render(v.__get, arrRender[i]) :v
+        supplement += (
+            v instanceof Obs ? v.render(v.__get, arrRender[i]) : 
+            ( v instanceof Render ? v.Obs.render(v.Obs.__get,  arrRender[i]) : v )
+        )
     })
     return supplement
 }
@@ -187,12 +191,13 @@ function mapAttr( dom, arr ) {
             return;
         }
 
-        if ( value instanceof Obs ) {
+        if ( value instanceof Obs || value instanceof Render ) {
             const render = [...value.renders]
+            value = value instanceof Render ? value.Obs : value
             value.attrtree.push( function ( type ) {
                 setAttribute(dom, key, value.render(value.__get, render) )
             })
-            value.renders.length = 0
+            // value.renders.length = 0
             return setAttribute(dom, key, value.render(value.__get, render) );
         }
 
@@ -200,13 +205,14 @@ function mapAttr( dom, arr ) {
             value = value.flat(Infinity);
             const arrRender = {}
             value.map( (v,i) => {
-                if ( v instanceof Obs ) {
+                if ( v instanceof Obs || v instanceof Render) {
                     arrRender[i] = [...v.renders]
+                    v = v instanceof Render ? v.Obs : v
                     v.attrtree.push( function ( type ) {
                         if ( type === 2 ) return dom.remove()
                         setAttribute(dom, key, supplementArray( value, arrRender ))
                     })
-                    v.renders.length = 0
+                    // v.renders.length = 0
                 }
             })
             return setAttribute( dom, key, supplementArray( value, arrRender ) )
