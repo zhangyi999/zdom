@@ -12,7 +12,7 @@ function addList( ) {
 }
 
 function reloadeArr(){
-    this.data.date  = i++
+    this.data.date  = !this.data.date
     console.log ( this.data.list)
     this.data.list = [{a:i++}]
 }
@@ -39,7 +39,7 @@ function Test( ...child ) {
     //     this.props.a = 21332213 
     // }, 4000);
     return (
-        dom.div({class: 'dk.k'}, this.a)
+        dom.div({class: ['dk.k', this.a.map( v => v == true? '2' : '1')]}, this.a)
     )
 }
 
@@ -47,8 +47,8 @@ const TestCommpent = Commponent(Test)
 
 function Index() {
     const $ = new Obs({
-        date: '--',
-        list: [ dom.p({}, 'load')],
+        date: true,
+        list: [ dom.p({}, 'load') ],
         // deepLisst: [
         //     {a:{
         //         b:'12133'
@@ -65,8 +65,9 @@ function Index() {
     // }, 1000);
     return (
         dom.div({},
-            // dom.h2({},'this is demo'),
-            dom.div({}, 
+            dom.h2({class:$.date.map( v => v == true? '1':'0' )},'this is demo'),
+            dom.div({class: ['ddd ',$.date.map( v => v == true? '1':'0' )]}, 
+                $.date.map( v => v == true? '1':'0' )
                 // dom.h4({},'time'),
                 // dom.p({}, $.date )
             ),
@@ -81,7 +82,7 @@ function Index() {
                         console.log ( v, 'vvvssss1' )
                         return v 
                     })}) 
-                    return dom.input({class:v.a,checked: v.a, type:'checkbox'})
+                    // return dom.input({class:v.a,checked: v.a, type:'checkbox'})
                 }) )
             ),
             // dom.div({}, 

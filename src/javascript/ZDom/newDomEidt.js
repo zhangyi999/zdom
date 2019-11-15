@@ -154,10 +154,10 @@ function setAttribute(dom, key, attrs) {
     dom.setAttribute(key, attrs);
 }
 
-function supplementArray( arr ) {
+function supplementArray( arr, arrRender ) {
     let supplement = ''
-    arr.map( (v = '') => {
-        supplement += v instanceof Obs ? v.__get :v
+    arr.map( (v = '', i ) => {
+        supplement += v instanceof Obs ? v.render(v.__get, arrRender[i]) :v
     })
     return supplement
 }
@@ -188,24 +188,28 @@ function mapAttr( dom, arr ) {
         }
 
         if ( value instanceof Obs ) {
+            const render = [...value.renders]
             value.attrtree.push( function ( type ) {
-                if ( type === 2 ) return dom.remove()
-                setAttribute(dom, key, value.__get )
+                setAttribute(dom, key, value.render(value.__get, render) )
             })
-            return setAttribute(dom, key, value.__get );
+            value.renders.length = 0
+            return setAttribute(dom, key, value.render(value.__get, render) );
         }
 
         if ( value instanceof Array ) {
             value = value.flat(Infinity);
-            value.map( v => {
+            const arrRender = {}
+            value.map( (v,i) => {
                 if ( v instanceof Obs ) {
+                    arrRender[i] = [...v.renders]
                     v.attrtree.push( function ( type ) {
                         if ( type === 2 ) return dom.remove()
-                        setAttribute(dom, key, supplementArray( value ))
+                        setAttribute(dom, key, supplementArray( value, arrRender ))
                     })
+                    v.renders.length = 0
                 }
             })
-            return setAttribute( dom, key, supplementArray( value ) )
+            return setAttribute( dom, key, supplementArray( value, arrRender ) )
         }
         setAttribute(dom, key, value )
     })
