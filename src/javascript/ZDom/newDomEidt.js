@@ -83,6 +83,7 @@ function replaceDom( type, prant, oldDom, obs, newValue, renders ) {
         })
     }
     // debugger
+    console.log ( [oldDom] )
     return ArrayElement[type]( prant, oldDom, fragment, newValue )
 }
 
@@ -91,7 +92,7 @@ function replaceDom( type, prant, oldDom, obs, newValue, renders ) {
 function addObsDom( prant, obs ) {
     // 仅考虑单层数组，对象 直接渲染，不用遍历
     const fragment = document.createDocumentFragment()
-
+    let prantoldDom = ''
     const renders = [...obs.renders]
     obs = obs instanceof Render ? obs.Obs : obs
     if ( obs.__get instanceof Array ) {
@@ -102,19 +103,18 @@ function addObsDom( prant, obs ) {
             obs[i].domtree.push((type, newValue) => {
                 // bug 老节点
                 // console.log ( obs, newValue, ' obsobsobs' )
-                oldDom = replaceDom( type, fragment1, oldDom, obs[i], newValue, renders )
+                prantoldDom = oldDom = replaceDom( type, fragment1, oldDom, obs[i], newValue, renders )
             })
             fragment.appendChild( fragment1 )
         })
     } else addChild ( fragment, obs.render( obs, renders ))
-    let oldDom = Array.from( fragment.childNodes )
+    prantoldDom = Array.from( fragment.childNodes )
     prant.appendChild( fragment )
-    // console.log( obs , fragment, 'obsobsobsobsobsobsobsobs' )
     // debugger
     obs.domtree.push((type, newValue) => {
         // bug 老节点
         // console.log ( obs, newValue, ' obsobsobs' )
-        oldDom = replaceDom( type, prant, oldDom, obs, newValue, renders )
+        prantoldDom = replaceDom( type, prant, prantoldDom, obs, newValue, renders )
     })
     
 }
