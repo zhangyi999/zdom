@@ -83,7 +83,6 @@ function replaceDom( type, prant, oldDom, obs, newValue, renders ) {
         })
     }
     // debugger
-    console.log ( [oldDom] )
     return ArrayElement[type]( prant, oldDom, fragment, newValue )
 }
 
