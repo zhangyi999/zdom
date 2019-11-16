@@ -1,8 +1,9 @@
 import DomPrototype from './dom'
 
-import Obs from './Obs'
+import Obs, {Render} from './Obs'
 
 import {ObjectMap} from './public'
+import { debuglog } from 'util';
 
 
 function addElemens ( p, newElement, targetElement) {
@@ -64,7 +65,8 @@ const ArrayElement = [
 function replaceDom( type, prant, oldDom, obs, newValue, renders ) {
     // console.log (obs, newValue,'newValuenewValuenewValue1-----' )
     // 仅考虑单层数组，对象 直接渲染，不用遍历
-    
+    // const kk = obs.render( newValue, renders )
+    // console.log (obs, renders, kk, 'dome' )
     // const kk = obs.render( newValue, renders )
     const fragment = type === 3 ? obs.render( newValue, renders ) : document.createDocumentFragment()
     // debugger
@@ -72,13 +74,13 @@ function replaceDom( type, prant, oldDom, obs, newValue, renders ) {
         const len = Object.keys(obs).length
         // debugger
         newValue.map( (v, i) => {
-            i = len+i - 1
+            type === 1?i = len+i - 1:''
             addChild ( fragment, obs[i].render( obs[i], renders.map( v => (v1,i1) => v(v1, i) )) )
             let oldDom = Array.from( fragment.childNodes )
             obs[i].domtree.push((type, newValue) => {
                 // bug 老节点
                 // console.log ( obs, newValue, ' obsobsobs' )
-                oldDom = replaceDom( type, fragment, oldDom, obs[len+i], newValue, renders )
+                oldDom = replaceDom( type, fragment, oldDom, obs[i], newValue, renders )
             })
         })
     }
@@ -91,8 +93,10 @@ function replaceDom( type, prant, oldDom, obs, newValue, renders ) {
 function addObsDom( prant, obs ) {
     // 仅考虑单层数组，对象 直接渲染，不用遍历
     const fragment = document.createDocumentFragment()
+    let prantoldDom = ''
     const renders = [...obs.renders]
-    obs.renders.length = 0
+    // debugger
+    obs = obs instanceof Render ? obs.Obs : obs
     if ( obs.__get instanceof Array ) {
         obs.__get.map( (v, i) => {
             const fragment1 = document.createDocumentFragment()
@@ -102,18 +106,18 @@ function addObsDom( prant, obs ) {
                 // bug 老节点
                 // console.log ( obs, newValue, ' obsobsobs' )
                 oldDom = replaceDom( type, fragment1, oldDom, obs[i], newValue, renders )
+                type === 3? prantoldDom = oldDom:''
             })
             fragment.appendChild( fragment1 )
         })
     } else addChild ( fragment, obs.render( obs, renders ))
-    let oldDom = Array.from( fragment.childNodes )
+    prantoldDom = Array.from( fragment.childNodes )
     prant.appendChild( fragment )
-    // console.log( obs , fragment, 'obsobsobsobsobsobsobsobs' )
     // debugger
     obs.domtree.push((type, newValue) => {
         // bug 老节点
         // console.log ( obs, newValue, ' obsobsobs' )
-        oldDom = replaceDom( type, prant, oldDom, obs, newValue, renders )
+        prantoldDom = replaceDom( type, prant, prantoldDom, obs, newValue, renders )
     })
     
 }
@@ -126,7 +130,7 @@ function creatDocumentFragment(childs) {
 
 function addChild ( prant, childs ) {
     if ( childs === undefined ) return ''
-    if ( childs instanceof Obs ) {
+    if ( childs instanceof Obs || childs instanceof Render ) {
         addObsDom( prant, childs )
     } else if ( childs instanceof Array ) {
         const len =  childs.length;
@@ -154,10 +158,13 @@ function setAttribute(dom, key, attrs) {
     dom.setAttribute(key, attrs);
 }
 
-function supplementArray( arr ) {
+function supplementArray( arr, arrRender ) {
     let supplement = ''
-    arr.map( (v = '') => {
-        supplement += v instanceof Obs ? v.__get :v
+    arr.map( (v = '', i ) => {
+        supplement += (
+            v instanceof Obs ? v.render(v.__get, arrRender[i]) : 
+            ( v instanceof Render ? v.Obs.render(v.Obs.__get,  arrRender[i]) : v )
+        )
     })
     return supplement
 }
@@ -187,25 +194,32 @@ function mapAttr( dom, arr ) {
             return;
         }
 
-        if ( value instanceof Obs ) {
+        if ( value instanceof Obs || value instanceof Render ) {
+            const render = [...value.renders]
+            value = value instanceof Render ? value.Obs : value
             value.attrtree.push( function ( type ) {
-                if ( type === 2 ) return dom.remove()
-                setAttribute(dom, key, value.__get )
+                setAttribute(dom, key, value.render(value.__get, render) )
             })
-            return setAttribute(dom, key, value.__get );
+            // value.renders.length = 0
+            return setAttribute(dom, key, value.render(value.__get, render) );
         }
 
         if ( value instanceof Array ) {
             value = value.flat(Infinity);
-            value.map( v => {
-                if ( v instanceof Obs ) {
+            const arrRender = {}
+            value.map( (v,i) => {
+                if ( v instanceof Obs || v instanceof Render) {
+                    // console.log (i, v, 'attr' )
+                    arrRender[i] = [...v.renders]
+                    v = v instanceof Render ? v.Obs : v
                     v.attrtree.push( function ( type ) {
                         if ( type === 2 ) return dom.remove()
-                        setAttribute(dom, key, supplementArray( value ))
+                        setAttribute(dom, key, supplementArray( value, arrRender ))
                     })
+                    // v.renders.length = 0
                 }
             })
-            return setAttribute( dom, key, supplementArray( value ) )
+            return setAttribute( dom, key, supplementArray( value, arrRender ) )
         }
         setAttribute(dom, key, value )
     })

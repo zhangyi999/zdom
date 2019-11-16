@@ -15,6 +15,16 @@ function Observable( obj, key, obs ) {
     return obj
 }
 
+class Render {
+	constructor(fn, Obs) {
+		this.renders = fn instanceof Array ? fn : [fn]
+		this.Obs = Obs
+	}
+	map(fn) {
+        return new Render( [...this.renders, fn], this.Obs )
+	}
+}
+
 // return ture is diff status
 
 function isDiff( newData, oldObs ) {
@@ -25,17 +35,13 @@ function isDiff( newData, oldObs ) {
         Object.keys(oldObs).map (v => {
             oldObs[v].remove()
             delete oldObs[v]
-            delete oldObs[v].data[v]
+            delete oldObs.data[v]
         })
         
         if ( ( newData instanceof Object) ) oldObs.init( newData )
         oldObs.replace(newData)
         return false
-    }
-
-    // if ( 
-    //     ( newData instanceof Object || oldData instanceof Object ) &&
-    //     checkTypes(newData) !== checkTypes(oldData)  
+    } 
     // ) throw '值为对象时，不可改变值得类型'
     if ( newData instanceof Object ) {
         const newValueArr = {}
@@ -44,25 +50,11 @@ function isDiff( newData, oldObs ) {
             if ( oldData[k] === undefined ) {
                 newValueArr[k] = v
             } else {
-                // 0.3 只考虑 [{}] 一层状态，哈哈，能力有限，请见谅
-                // if ( v instanceof Object ) {
-                //     ObjectMap( v, (v, k1) => {
-                //         isDiff( v, oldObs[k][k1] )
-                //     })
-                // } else {
-                //     isDiff( v, oldObs[k] )
-                // }
                 isDiff( v, oldObs[k] )
             }
         })
         ObjectMap( oldData, (v,k) => {
             if ( newData[k] === undefined ) {
-                // Object.keys(oldObs[k]).map ( v => {
-                //     oldObs[k][v].remove()
-                //     delete oldObs[k][v]
-                //     delete oldObs.data[k]
-                // })
-                // console.log ( k, oldObs )
                 oldObs[k].remove()
                 delete oldObs[k]
                 delete oldObs.data[k]
@@ -116,44 +108,13 @@ function bindObs( obsDomObj, obsObj, key, value ) {
 // domtree: 0 | 从头部增加，1 | 从尾部增加， 2 | 删除，3 | 替换  
 class Obs {
     constructor( valueAny ) {
-        // this.renders = [] 
-        // this.domtree = []
-        // this.attrtree = []
-        // this.watch = []
+        if ( valueAny instanceof Obs ) return valueAny
         addPorto(this, 'domtree', [])
         addPorto(this, 'attrtree', [])
         addPorto(this, 'watch', [])
         addPorto(this, 'renders', [])
-        // addPorto(this, 'data', valueAny, {writable:true})
         addPorto(this, '__get', valueAny, {writable:true})
-        addPorto(this, '__set', ( newValue ) => {
-            
-            // if ( newValue === null ) return this.rmove()
-            if ( isDiff( newValue, this ) === false ) return
-            
-            // Object.keys(this).map ( v => {
-            //     delete this[v]
-            // })
-
-            // delete this.data
-            // const domtree = [...this.domtree]
-            // const attrtree = [...this.attrtree]
-            // const watch = [...this.watch]
-            // this.domtree.length = 0
-            // // this.attrtree.length = 0
-            // this.watch.length = 0
-            // // this.domtree.length = 0
-
-            // this.init( newValue )
-
-            // domtree.map( v => v(3, this) );
-            // attrtree.map( v => v());
-            // watch.map( v => v(newValue) );
-            // // 非对象类型重置时会重新渲染，push domtree
-            // if ( !( newValue instanceof Object) ) return
-            // this.domtree.push(...domtree)
-            // this.watch.push(...watch)
-        })
+        addPorto(this, '__set', ( newValue ) => isDiff( newValue, this ))
         this.init( valueAny )
     }
 
@@ -166,7 +127,6 @@ class Obs {
                 return this.__get
             },
             set(newVal) {
-                // console.log ( this, newVal )
                 this.__set(newVal)
             }
         });
@@ -228,9 +188,9 @@ class Obs {
             // nV[len] = newValue[i]
             const k = len - 1 - i
             this[ k + valueLen ] = this[ k ]
-            // console.log ( this[ k + valueLen ] )
-            bindObs( this, this.data, k + valueLen, this[ k ].__get )
+            this.data[ k + valueLen] = this.data[ k ]
         }
+        // console.log ( this )
         this.add ( newValue )
     }
 
@@ -241,15 +201,16 @@ class Obs {
     }
 
     map( fun ) {
-        this.renders.push(fun)
-        return this
+        return new Render(fun, this)
     }
 
     renderValue (fnArray, v, i ) {
         let prvValue = v;
         fnArray.map( fn => {
             if ( prvValue !== undefined ) prvValue = fn( prvValue, i )
+            // console.log ( prvValue, fn, '2' )
         })
+        // console.log ( prvValue, fnArray, '3' )
         return prvValue
     }
 
@@ -259,6 +220,7 @@ class Obs {
 
     render( newValue, renderFunArray ) {
         // if ( this.renders.length === 0 ) return newValue
+        // console.log ( newValue, renderFunArray, '1' )
         if ( newValue instanceof Obs ) {
             const value = newValue.__get
             if ( Object.keys(newValue).length === 0 ) {
@@ -285,22 +247,10 @@ class Obs {
     }
 }
 
-// function renderValue ( v, i ) {
-//     let prvValue = v;
-//     this.renders.map( fn => {
-//         prvValue = fn( prvValue, i )
-//     })
-//     return prvValue
-// }
-
-// function render( v ) {
-//     if ( v instanceof Array ) return renderArray(v)
-//     return renderValue ( v )
-// }
-
 export default Obs
 
 export {
-    addPorto
+    addPorto,
+    Render
 }
 

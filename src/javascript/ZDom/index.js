@@ -30,9 +30,9 @@ function Commponent(ZDomCommponFunction) {
                         attr[key].data = newVal
                     }
                 })
-                addPorto(props, key, v)
+                addPorto(props, key, v, {writable:true, enumerable: true})
                 
-            } else props.props[key] = v
+            } else props[key] = v
         })
         const dom = ZDomCommponFunction.call(props, chlid);
         props.loaded?setTimeout(()=> props.loaded(),0):''; 
