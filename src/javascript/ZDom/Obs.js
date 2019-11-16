@@ -36,7 +36,7 @@ function isDiff( newData, oldObs ) {
         Object.keys(oldObs).map (v => {
             oldObs[v].remove()
             delete oldObs[v]
-            delete oldObs[v].data[v]
+            delete oldObs.data[v]
         })
         
         if ( ( newData instanceof Object) ) oldObs.init( newData )
