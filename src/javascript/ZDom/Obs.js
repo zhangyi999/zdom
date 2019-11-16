@@ -190,9 +190,9 @@ class Obs {
             // nV[len] = newValue[i]
             const k = len - 1 - i
             this[ k + valueLen ] = this[ k ]
-            // console.log ( this[ k + valueLen ] )
-            bindObs( this, this.data, k + valueLen, this[ k ].__get )
+            this.data[ k + valueLen] = this.data[ k ]
         }
+        // console.log ( this )
         this.add ( newValue )
     }
 

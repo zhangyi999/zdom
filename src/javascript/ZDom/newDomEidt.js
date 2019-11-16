@@ -3,6 +3,7 @@ import DomPrototype from './dom'
 import Obs, {Render} from './Obs'
 
 import {ObjectMap} from './public'
+import { debuglog } from 'util';
 
 
 function addElemens ( p, newElement, targetElement) {
@@ -69,16 +70,16 @@ function replaceDom( type, prant, oldDom, obs, newValue, renders ) {
     const fragment = type === 3 ? obs.render( newValue, renders ) : document.createDocumentFragment()
     // debugger
     if ( type === 0 || type === 1 ) {
-        const len = Object.keys(obs).length
+        // const len = Object.keys(obs).length
         // debugger
         newValue.map( (v, i) => {
-            i = len+i - 1
+            type === 1?i = len+i - 1:''
             addChild ( fragment, obs[i].render( obs[i], renders.map( v => (v1,i1) => v(v1, i) )) )
             let oldDom = Array.from( fragment.childNodes )
             obs[i].domtree.push((type, newValue) => {
                 // bug 老节点
                 // console.log ( obs, newValue, ' obsobsobs' )
-                oldDom = replaceDom( type, fragment, oldDom, obs[len+i], newValue, renders )
+                oldDom = replaceDom( type, fragment, oldDom, obs[i], newValue, renders )
             })
         })
     }
@@ -102,7 +103,8 @@ function addObsDom( prant, obs ) {
             obs[i].domtree.push((type, newValue) => {
                 // bug 老节点
                 // console.log ( obs, newValue, ' obsobsobs' )
-                prantoldDom = oldDom = replaceDom( type, fragment1, oldDom, obs[i], newValue, renders )
+                oldDom = replaceDom( type, fragment1, oldDom, obs[i], newValue, renders )
+                type === 3? prantoldDom = oldDom:''
             })
             fragment.appendChild( fragment1 )
         })

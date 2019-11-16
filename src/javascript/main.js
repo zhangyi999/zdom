@@ -7,7 +7,7 @@ import dom,{Obs, Commponent} from './ZDom'
  */ 
 let i = 0
 function addList( ) {
-    this.list.push([{a:99}])
+    this.list.unshift([{a:99}])
     console.log  ( this )
 }
 
@@ -23,11 +23,11 @@ function chengeArr4(){
     // this.data.list[6].a = (dom.b({},'this is 4'))
     // this.data.deepLisst[0] = ({a:{b:'33333'}})
 
-    console.log ( this.data.list )
+    console.log ( this.list )
     this.data.list[0].a = !this.data.list[0].a
     this.data.list[2].a = !this.data.list[2].a
     console.log(
-        this.list[0].a ,'sdfsdfds'
+        this.list[2].a ,'sdfsdfds'
     )
 }
 
@@ -38,6 +38,7 @@ function Test( ...child ) {
     //     dk.data.k = 123312
     //     this.props.a = 21332213 
     // }, 4000);
+    console.log ( this )
     return (
         dom.div({class: ['dk.k', this.a.map( v => v == true? '2' : '1')]}, this.a)
     )
