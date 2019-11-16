@@ -65,12 +65,13 @@ const ArrayElement = [
 function replaceDom( type, prant, oldDom, obs, newValue, renders ) {
     // console.log (obs, newValue,'newValuenewValuenewValue1-----' )
     // 仅考虑单层数组，对象 直接渲染，不用遍历
-    
+    // const kk = obs.render( newValue, renders )
+    // console.log (obs, renders, kk, 'dome' )
     // const kk = obs.render( newValue, renders )
     const fragment = type === 3 ? obs.render( newValue, renders ) : document.createDocumentFragment()
     // debugger
     if ( type === 0 || type === 1 ) {
-        // const len = Object.keys(obs).length
+        const len = Object.keys(obs).length
         // debugger
         newValue.map( (v, i) => {
             type === 1?i = len+i - 1:''
@@ -94,6 +95,7 @@ function addObsDom( prant, obs ) {
     const fragment = document.createDocumentFragment()
     let prantoldDom = ''
     const renders = [...obs.renders]
+    // debugger
     obs = obs instanceof Render ? obs.Obs : obs
     if ( obs.__get instanceof Array ) {
         obs.__get.map( (v, i) => {
@@ -207,6 +209,7 @@ function mapAttr( dom, arr ) {
             const arrRender = {}
             value.map( (v,i) => {
                 if ( v instanceof Obs || v instanceof Render) {
+                    // console.log (i, v, 'attr' )
                     arrRender[i] = [...v.renders]
                     v = v instanceof Render ? v.Obs : v
                     v.attrtree.push( function ( type ) {

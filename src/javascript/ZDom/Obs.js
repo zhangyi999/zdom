@@ -17,12 +17,11 @@ function Observable( obj, key, obs ) {
 
 class Render {
 	constructor(fn, Obs) {
-		this.renders = [fn]
+		this.renders = fn instanceof Array ? fn : [fn]
 		this.Obs = Obs
 	}
 	map(fn) {
-		this.renders.push(fn)
-		return this
+        return new Render( [...this.renders, fn], this.Obs )
 	}
 }
 
@@ -128,7 +127,6 @@ class Obs {
                 return this.__get
             },
             set(newVal) {
-                // console.log ( this, newVal )
                 this.__set(newVal)
             }
         });
@@ -210,7 +208,9 @@ class Obs {
         let prvValue = v;
         fnArray.map( fn => {
             if ( prvValue !== undefined ) prvValue = fn( prvValue, i )
+            // console.log ( prvValue, fn, '2' )
         })
+        // console.log ( prvValue, fnArray, '3' )
         return prvValue
     }
 
@@ -220,6 +220,7 @@ class Obs {
 
     render( newValue, renderFunArray ) {
         // if ( this.renders.length === 0 ) return newValue
+        // console.log ( newValue, renderFunArray, '1' )
         if ( newValue instanceof Obs ) {
             const value = newValue.__get
             if ( Object.keys(newValue).length === 0 ) {
