@@ -28,6 +28,7 @@ class Render {
 // return ture is diff status
 
 function isDiff( newData, oldObs ) {
+
     const oldData = oldObs.__get
     if ( newData === oldData ) return false
     if ( checkTypes(newData) !== checkTypes(oldData) ) {
@@ -78,8 +79,6 @@ function isDiff( newData, oldObs ) {
         oldObs.replace( newData )
         return false
     }
-
-    
 
 } 
 
@@ -149,7 +148,9 @@ class Obs {
         // this.watch.length = 0
 
         domtree.map( v => v(3, this) );
-        attrtree.map( v => v());
+        attrtree.map( v => v());         
+        // domtree.map( v => v(3, this) );
+        
         watch.map( v => v(newOnObject) );
         // 非对象类型重置时会重新渲染，push domtree
         // if ( !( newValue instanceof Object) ) return

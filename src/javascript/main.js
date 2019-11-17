@@ -1,6 +1,8 @@
 
 import dom,{Obs, Commponent} from './ZDom'
 
+
+
 /**
     bug
     2 map 函数中的 Obs 对象 被删除后 无法 恢复，主要需要处理 {} map 中的方法
@@ -12,11 +14,14 @@ function addList( ) {
 }
 
 function reloadeArr(){
-    console.time('1')
-    this.data.date  = !this.data.date
-    console.log ( this.data.list)
-    this.data.list = [{a:i++}]
-    console.timeEnd('1')
+    // console.time('1')
+        this.data.date  = !this.data.date
+
+    // alert(value)
+    
+    // console.log ( this.data.list)
+    // this.data.list = [{a:i++}]
+    // console.timeEnd('1')
 }
  
 function chengeArr4(){
@@ -77,6 +82,8 @@ function Index() {
     //     $.data.date = new Date().Format('yyyy.MM.dd hh:mm:ss')
     //     i > 6? clearInterval(k):''
     // }, 1000);
+
+// alert($.date.map)
     return (
         dom.div({},
             dom.h2({class:$.date.map( v => v == true? '1':'0' )},'this is demo'),
@@ -114,19 +121,18 @@ function Index() {
                 // dom.h4({},'list'),
                 // TestCommpent({a:$.date}),
                 // dom.p({}, $.list[0].a ),
-                dom.p({}, $.list.map( (v,i) => {
-                    // console.log ( v, i, 'vvvssss' )
-                    if ( v.a === undefined ) return v
-                    return TestCommpent({a:v.a.map(v => {
-                        console.log ( v, 'vvvssss1' )
-                        return v 
-                    })}) 
-                    // return dom.input({class:v.a,checked: v.a, type:'checkbox'})
-                }) )
+                // dom.p({}, $.list.map( (v,i) => {
+                //     // console.log ( v, i, 'vvvssss' )
+                //     if ( v.a === undefined ) return v
+                //     return TestCommpent({a:v.a.map(v => {
+                //         console.log ( v, 'vvvssss1' )
+                //         return v 
+                //     })}) 
+                //     // return dom.input({class:v.a,checked: v.a, type:'checkbox'})
+                // }) )
             ),
             
         )
     )
 }
-
 document.getElementById('app').appendChild(Index())
