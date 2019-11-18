@@ -1,4 +1,4 @@
-import 'polyfill'
+import './polyfill'
 import Obs,{addPorto} from './Obs'
 import dom from './newDomEidt'
 
