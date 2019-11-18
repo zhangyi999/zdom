@@ -3,7 +3,6 @@ import DomPrototype from './dom'
 import Obs, {Render} from './Obs'
 
 import {ObjectMap} from './public'
-import { debuglog } from 'util';
 
 
 function addElemens ( p, newElement, targetElement) {
