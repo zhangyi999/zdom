@@ -20,7 +20,7 @@ function reloadeArr(){
     // alert(value)
     
     // console.log ( this.data.list)
-    // this.data.list = [{a:i++}]
+    this.data.list = [{a:i++}]
     // console.timeEnd('1')
 }
  
@@ -93,14 +93,14 @@ function Index() {
                 // dom.p({}, $.date )
             ),
             
-            // dom.div({}, 
-            //     dom.h4({},'list'),
-            //     // dom.p({}, $.deepLisst.map( v => {
-            //     //     console.log ( v ,'cccssss')
-            //     //     return dom.p({}, v.b )
-            //     // }) ),
-            //     // dom.p({}, $.list.map( v => dom.p({}, v.a || v)) )
-            // ),
+            dom.div({}, 
+                dom.h4({},'list'),
+                // dom.p({}, $.deepLisst.map( v => {
+                //     console.log ( v ,'cccssss')
+                //     return dom.p({}, v.b )
+                // }) ),
+                // dom.p({}, $.list.map( v => dom.p({}, v.a || v)) )
+            ),
             
             dom.p({},
                 dom.a({
@@ -121,15 +121,15 @@ function Index() {
                 // dom.h4({},'list'),
                 // TestCommpent({a:$.date}),
                 // dom.p({}, $.list[0].a ),
-                // dom.p({}, $.list.map( (v,i) => {
-                //     // console.log ( v, i, 'vvvssss' )
-                //     if ( v.a === undefined ) return v
-                //     return TestCommpent({a:v.a.map(v => {
-                //         console.log ( v, 'vvvssss1' )
-                //         return v 
-                //     })}) 
-                //     // return dom.input({class:v.a,checked: v.a, type:'checkbox'})
-                // }) )
+                dom.p({}, $.list.map( (v,i) => {
+                    // console.log ( v, i, 'vvvssss' )
+                    if ( v.a === undefined ) return v
+                    return TestCommpent({a:v.a.map(v => {
+                        console.log ( v, 'vvvssss1' )
+                        return v 
+                    })}) 
+                    // return dom.input({class:v.a,checked: v.a, type:'checkbox'})
+                }) )
             ),
             
         )
