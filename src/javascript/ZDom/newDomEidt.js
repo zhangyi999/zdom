@@ -54,8 +54,14 @@ const ArrayElement = [
         }
         oldRepalce = Array.from( addElement.childNodes )
         oldDom.ondie?oldDom.ondie():''
-        // prant.replaceChild(addElement, oldDom)
-        oldDom.replaceWith(addElement)
+        prant.replaceChild(addElement, oldDom)
+        // try{
+        //     alert(oldDom.replaceWith)
+        //     oldDom.replaceWith(addElement) 
+        // } catch (error) {
+        //     alert(error)
+        // }
+       
         return oldRepalce;
     }
 ]
@@ -172,7 +178,6 @@ function supplementArray( arr, arrRender ) {
 function mapAttr( dom, arr ) {
     ObjectMap(arr, ( value, key ) => {
         if(!value && value !== 0 ) return
-
         if(key === '$data') {
             dom.$data = value
             return;
@@ -193,6 +198,7 @@ function mapAttr( dom, arr ) {
             })
             return;
         }
+        
 
         if ( value instanceof Obs || value instanceof Render ) {
             const render = [...value.renders]
@@ -203,12 +209,14 @@ function mapAttr( dom, arr ) {
             // value.renders.length = 0
             return setAttribute(dom, key, value.render(value.__get, render) );
         }
-
+        
         if ( value instanceof Array ) {
             value = value.flat(Infinity);
             const arrRender = {}
             value.map( (v,i) => {
                 if ( v instanceof Obs || v instanceof Render) {
+                    
+
                     // console.log (i, v, 'attr' )
                     arrRender[i] = [...v.renders]
                     v = v instanceof Render ? v.Obs : v
@@ -216,12 +224,14 @@ function mapAttr( dom, arr ) {
                         if ( type === 2 ) return dom.remove()
                         setAttribute(dom, key, supplementArray( value, arrRender ))
                     })
-                    // v.renders.length = 0
+                  // v.renders.length = 0
                 }
             })
             return setAttribute( dom, key, supplementArray( value, arrRender ) )
+        
         }
         setAttribute(dom, key, value )
+
     })
 }
 
