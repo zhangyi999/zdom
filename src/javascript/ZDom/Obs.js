@@ -36,9 +36,9 @@ function isDiff( newData, oldObs ) {
         Object.keys(oldObs).map (v => {
             oldObs[v].remove()
             delete oldObs[v]
-            delete oldObs.data[v]
+            // delete oldObs.data[v]
         })
-        
+        delete oldObs.data
         if ( ( newData instanceof Object) ) oldObs.init( newData )
         oldObs.replace(newData)
         return false
@@ -72,10 +72,8 @@ function isDiff( newData, oldObs ) {
         newData instanceof Text || 
         newData instanceof DocumentFragment 
     ) {
-        Object.keys(oldObs).map ( v => {
-            delete oldObs[v]
-            delete oldObs.data[v]
-        })
+        Object.keys(oldObs).map ( v => delete oldObs[v])
+        // console.log ( newData, 'newData' )
         oldObs.replace( newData )
         return false
     }
@@ -221,7 +219,7 @@ class Obs {
 
     render( newValue, renderFunArray ) {
         // if ( this.renders.length === 0 ) return newValue
-        // console.log ( newValue, renderFunArray, '1' )
+        // console.log (  newValue, renderFunArray )
         if ( newValue instanceof Obs ) {
             const value = newValue.__get
             if ( Object.keys(newValue).length === 0 ) {
