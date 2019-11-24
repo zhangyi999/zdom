@@ -223,7 +223,7 @@ class Obs {
         if ( newValue instanceof Obs ) {
             const value = newValue.__get
             if ( Object.keys(newValue).length === 0 ) {
-                return this.renderValue( renderFunArray, newValue, null )
+                return this.renderValue( renderFunArray, value, null )
             }
             else if ( value instanceof Array ) {
                 // index 参数在 添加数组时 可能会出现重复
