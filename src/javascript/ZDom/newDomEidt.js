@@ -76,10 +76,10 @@ function replaceDom( type, prant, oldDom, obs, newValue, renders ) {
     const fragment = type === 3 ? obs.render( newValue, renders ) : document.createDocumentFragment()
     // debugger
     if ( type === 0 || type === 1 ) {
-        const len = Object.keys(obs).length
+        const len = Object.keys(obs).length - newValue.length
         // debugger
         newValue.map( (v, i) => {
-            type === 1?i = len+i - 1:''
+            type === 1?i = len+i:''
             addChild ( fragment, obs[i].render( obs[i], renders.map( v => (v1,i1) => v(v1, i) )) )
             let oldDom = Array.from( fragment.childNodes )
             obs[i].domtree.push((type, newValue) => {
