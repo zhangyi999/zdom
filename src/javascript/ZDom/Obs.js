@@ -232,7 +232,7 @@ class Obs {
             }
             else if ( value instanceof Object  ) {
                 if ( renderFunArray.length === 0 ) throw 'Objcet need map' 
-                return this.renderValue( renderFunArray, newValue, null )
+                return this.renderValue( renderFunArray, newValue, 0 )
             }
         }
 
