@@ -18,7 +18,7 @@ function getPageData() {
 function Commponent(ZDomCommponFunction) {
     return function ( attr, ...chlid ) {
         const props = {}
-        props.props = {}
+        addPorto(props, 'props', {})
         ObjectMap( attr, (v,key) => {
             if ( v instanceof Obs ) {
                 Object.defineProperty(props.props, key, {
@@ -31,9 +31,9 @@ function Commponent(ZDomCommponFunction) {
                         attr[key].data = newVal
                     }
                 })
-                addPorto(props, key, v, {writable:true, enumerable: true})
-                
-            } else props[key] = v
+                // addPorto(props, key, v, {writable:true, enumerable: true}) 
+            } 
+            addPorto(props, key, v, {writable:true, enumerable: true})
         })
         const dom = ZDomCommponFunction.call(props, chlid);
         props.loaded?setTimeout(()=> props.loaded(),0):''; 
