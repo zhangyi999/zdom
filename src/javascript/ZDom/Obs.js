@@ -231,7 +231,8 @@ class Obs {
                 return value.map( (v, i) => this.renderValue(renderFunArray, newValue[i], i))
             }
             else if ( value instanceof Object  ) {
-                return this.renderValue( renderFunArray, this, null )
+                if ( renderFunArray.length === 0 ) throw 'Objcet need map' 
+                return this.renderValue( renderFunArray, newValue, null )
             }
         }
 

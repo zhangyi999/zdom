@@ -77,9 +77,8 @@ function replaceDom( type, prant, oldDom, obs, newValue, renders ) {
     // debugger
     if ( type === 0 || type === 1 ) {
         const len = Object.keys(obs).length - newValue.length
-        // debugger
         newValue.map( (v, i) => {
-            type === 1?i = len+i:''
+            type === 1?i = i + len :''
             addChild ( fragment, obs[i].render( obs[i], renders.map( v => (v1,i1) => v(v1, i) )) )
             let oldDom = Array.from( fragment.childNodes )
             obs[i].domtree.push((type, newValue) => {
@@ -105,7 +104,8 @@ function addObsDom( prant, obs ) {
     if ( obs.__get instanceof Array ) {
         obs.__get.map( (v, i) => {
             const fragment1 = document.createDocumentFragment()
-            addChild ( fragment1, obs[i].render( obs[i], renders.map( v => v1 => v(v1, i))))
+            const rendersArr = renders.map( v => v1 => v(v1, i) )
+            addChild ( fragment1, obs[i].render( obs[i], rendersArr))
             let oldDom = Array.from( fragment1.childNodes )
             obs[i].domtree.push((type, newValue) => {
                 // bug 老节点
