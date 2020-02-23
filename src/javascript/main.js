@@ -56,6 +56,7 @@ function Index() {
     const k =  setInterval(() => {
         i ++
         $.data.date = new Date().Format('yyyy.MM.dd hh:mm:ss')
+        $.data.deepLisst[0].a.b = i
         i > 6? clearInterval(k):''
     }, 1000);
 
@@ -70,8 +71,11 @@ function Index() {
             ),
             
             dom.div({}, 
-                dom.h4({},'list'),
-                dom.p({}, $.deepLisst.map( v => {
+                dom.h4({},'list',
+                    $.deepLisst[0].a.b,
+                    dom.b({},$.deepLisst[0].a.b)
+                ),
+                dom.p({class:$.deepLisst[0].a.b}, $.deepLisst.map( v => {
                     return dom.p({}, v.a.b )
                 }) ),
                 dom.p({}, $.list.map( v => dom.p({}, v.a || v)) )
@@ -104,4 +108,14 @@ function Index() {
         )
     )
 }
+const head = document.getElementsByTagName('head')[0]
+
+head.appendChild(
+    dom.link({ 
+        rel: 'stylesheet',
+        media: 'all',
+        type: 'text/css',
+        cssURL: '//at.alicdn.com/t/font_1523230_yhz1njensc.css'
+    })
+);
 document.getElementById('app').appendChild(Index())
