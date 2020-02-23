@@ -1,6 +1,7 @@
 
 import dom,{Obs, Commponent} from './ZDom'
 
+import './init.css'
 
 
 /**
@@ -63,6 +64,7 @@ function Index() {
 // alert($.date.map)
     return (
         dom.div({},
+            dom.h1({class:'z_dom_content'},'new Data'),
             dom.h2({class:$.date.map( v => v == true? '1':'0' )},'this is demo'),
             dom.div({class: ['ddd ',$.date.map( v => v == true? '1':'0' )]}, 
                 $.date

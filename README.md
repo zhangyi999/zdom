@@ -18,12 +18,18 @@
 > npm run build
 > npm run up
 ```
+### UpSever
 
-### 更新
+通过命令上传到服务端
 
-* zdom.0.02: 新增分支 `zdom.0.02` ，修改了元素属性拼接方式，数组更新，和添加了一个极为简单的 diff 算法。
+```mv clientConfig-examples.js clientConfig.js'```
 
-* zdom.0.3: 重写 `Observable` 方法，解决数组对象的监听问题，减少绝大部分 不必要代码，去掉了组件，直接函数调用，相当方便。
+修改上传路径。
+
+```
+node up -z all
+```
+
 
 ### Zdom.0.3
 
@@ -158,5 +164,4 @@ function Index() {
 }
 
 document.getElementById('app').appendChild(Index())
-
 ```

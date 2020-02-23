@@ -1,12 +1,12 @@
 {
   "name": "zdom",
   "version": "1.0.0",
-  "description": "",
+  "description": "一个简单的ui框架，用于学习js",
   "main": "index.js",
   "scripts": {
     "start": "webpack-dev-server  --open --host 0.0.0.0 --mode development",
     "build": "webpack --mode production --config ./webpack.config.build.js",
-    "up": "node ./upfileToCline.js"
+    "upAll": "node up -z all"
   },
   "author": "",
   "license": "ISC",
@@ -46,6 +46,7 @@
     "child_process": "^1.0.2",
     "clean-webpack-plugin": "^0.1.19",
     "clipboard": "^2.0.1",
+    "commander": "^4.1.1",
     "connect-multiparty": "^2.1.0",
     "cookie-parser": "^1.4.3",
     "copy-to-clipboard": "^3.0.8",

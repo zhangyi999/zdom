@@ -2,6 +2,9 @@ var Client = require('scp2').Client;
 const util = require('util');
 const SSH = require('simple-ssh');
 const exec = util.promisify(require('child_process').exec);
+const fs = require('fs');
+const path = require('path');
+
 const Config = require('./clientConfig')
 
 
@@ -19,24 +22,8 @@ const client = new Client({
     password: PASSWORD,
 });
 
-const FileName = path => ({
-    css : `${path}.css`,
-    js: `${path}.js`,
-    html : `${path}.html`,
-    static: `/static`,
-})
-
-function getProcess() {
-    const [ file_type = 'index[js/css/html/static]' ] = process.argv.slice(2);
-    const [file_name, file_types] = (/(.*?)\[(.*?)\]/.exec(file_type) || ['','']).slice(1,3)
-    if(file_name === undefined || file_types === undefined) throw Error('Please enter the correct file format, such as: index[js/css/html/static]')
-    const filePath = FileName(file_name)
-    const fileNameArr = (file_types === ''?'js/html/css':file_types).split('/').map( v => filePath[v])
-    return fileNameArr.join(' ')
-}
-
-function zipFile() {
-    return exec(`cd ${local_path} && zip -r ${ARCHIVE_NAME} ${getProcess()}`);
+function zipFile( filesArr ) {
+    return exec(`cd ${local_path} && zip -r ${ARCHIVE_NAME} ${filesArr.join(' ')}`);
 }
 
 function upLoad(file_name) {
@@ -55,7 +42,7 @@ async function upFile() {
             console.log('开始上传:'+fileArr)
             console.log('---------------')
             const s = await upLoad(fileArr)
-            await exec(`cd ${local_path} && zip -r ${ARCHIVE_NAME} ${getProcess()}`)
+            await exec(`cd ${local_path} && rm -rf ${ARCHIVE_NAME}.zip`)
             if(s === null) {
                 console.log(fileArr+' 上传成功！')
                 console.log('---------------')
@@ -74,14 +61,16 @@ function unzipFile() {
         pass: PASSWORD,
     });
     return new Promise((resolve, reject) => {
-        ssh.exec(`unzip -o -d ${service_path} ${service_path}/${ARCHIVE_NAME}.zip`, {
+        ssh.exec(`unzip -o ${service_path}${ARCHIVE_NAME}.zip -d ${service_path}`, {
             out: (stdout) => console.log(stdout),
-        }).exec(`rm ${service_path}/${ARCHIVE_NAME}.zip`, {
+        })
+        .exec(`rm -rf ${service_path}${ARCHIVE_NAME}.zip`, {
             out: (stdout) => console.log(stdout),
             exit: () => {
                 resolve()
             },
-        }).on('error', function(err) {
+        })
+        .on('error', function(err) {
             reject()
             console.log('解压失败')
             ssh.end();
@@ -90,14 +79,27 @@ function unzipFile() {
     })
 }
 
-(async function up() {
-    console.log('文件打包...')
-    await zipFile()
+// 列出可压缩的文件夹
+function getDirectories( fn ) {
+    const d = []
+    fs.readdirSync(local_path).filter(function(file, i) {
+        if ( !(fn instanceof Function)){
+            file !== '.DS_Store' ? d.push(file) : ''
+        } else if ( fn( i, file ) ) {
+            file !== '.DS_Store' ? d.push(file) : ''
+        } 
+    });
+    return d
+}
+
+// 上传文件并解压
+async function upFileToSever( ) {
     await upFile()
     await unzipFile()
-    console.log('更新成功')
-    process.exit();
-})();
+}
 
-
-
+module.exports = {
+    getDirectories,
+    zipFile,
+    upFileToSever
+}
