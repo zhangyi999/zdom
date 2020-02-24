@@ -1,12 +1,14 @@
 {
   "name": "zdom",
   "version": "1.0.0",
+  "bin": "./zdom.js",
   "description": "一个简单的ui框架，用于学习js",
   "main": "index.js",
   "scripts": {
     "start": "webpack-dev-server  --open --host 0.0.0.0 --mode development",
     "build": "webpack --mode production --config ./webpack.config.build.js",
-    "upAll": "node up -z all"
+    "upAll": "node zdom -z all",
+    "cp": "node zdom -a"
   },
   "author": "",
   "license": "ISC",
