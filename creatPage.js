@@ -18,7 +18,7 @@ const ObsHtml = (
 const indexCss = `import './index.css'`
 
 const examples_js = (name, css,isObs) => (
-`import dom,{ Commponent, Obs } from '../../ZDom'
+`import dom,{ Commponent${isObs? ', Obs' : ''} } from '../../ZDom'
 ${css? indexCss : ''}
 function ${name} (...child) {
     ${isObs? ObsHtml : ''}
