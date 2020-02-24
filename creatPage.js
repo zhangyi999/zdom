@@ -16,7 +16,9 @@ function ${name} (...child) {
     const $ = new Obs({
         d : 'a'
     })
-    return dom.div({class:'p_${name}'}, child)
+    return (
+        dom.div({class:'p_${name}'}, child)
+    )
 }
 
 export default Commponent(${name})
