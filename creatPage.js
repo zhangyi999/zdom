@@ -8,8 +8,7 @@ const filePath ={
 } 
 
 const examples_js = name => (
-`
-import dom,{ Commponent, Obs } from '../../ZDom'
+`import dom,{ Commponent, Obs } from '../../ZDom'
 
 // import './index.css'
 
