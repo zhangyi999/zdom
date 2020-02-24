@@ -37,8 +37,8 @@ async function zipFile( arg ) {
 }
 
 function Cp( arg ) {
-    const [type, name] = arg.split(':') 
-    creatPage( name.charAt(0).toUpperCase() + name.slice(1), type )
+    const [type, name, css, isObs] = arg.split(':') 
+    creatPage( name.charAt(0).toUpperCase() + name.slice(1), type, css === 'css' ? true : null, isObs )
 }
 
 program
