@@ -1,0 +1,6 @@
+{
+    "type": ["cn","en"],
+    "cont": {
+        "balance": [ "余额", "balance" ]
+    }
+}

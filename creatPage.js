@@ -17,13 +17,14 @@ const ObsHtml = (
 
 const indexCss = `import './index.css'`
 
-const examples_js = (name, css,isObs) => (
+const examples_js = (name, css,isObs, type) => (
 `import dom,{ Commponent${isObs? ', Obs' : ''} } from '../../ZDom'
 ${css? indexCss : ''}
+${type === 'p' ? "import Page from '../../Commponent/Page'" : '' }
 function ${name} (...child) {
     ${isObs? ObsHtml : ''}
     return (
-        dom.div({class:'p_${name}'}, child)
+        ${type === 'p' ? 'Page' : 'dom.div' }({class:'p_${name}'}, child)
     )
 }
 
@@ -40,7 +41,7 @@ function getExamples(  name, type = 'p_path', Css, isObs ) {
     const fl = p_path+name
     if (!fs.existsSync(fl)) {
         fs.mkdirSync(fl);
-        fs.writeFile(fl+'/index.js', examples_js(name, Css, isObs),'utf8', e => {
+        fs.writeFile(fl+'/index.js', examples_js(name, Css, isObs, type),'utf8', e => {
             if ( Css !== null ) {
                 fs.writeFile(fl+'/index.css', `.p_${name}{}`,'utf8', e => {
                     console.log ( 'created page in ', fl )

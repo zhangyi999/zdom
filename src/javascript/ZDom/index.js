@@ -49,5 +49,6 @@ export {
     Obs,
     ObjectMap,
     getPageData,
-    Commponent
+    Commponent,
+    addPorto
 }

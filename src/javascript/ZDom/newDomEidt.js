@@ -185,7 +185,7 @@ function mapAttr( dom, arr ) {
         if(/@\S/.test(key)) {
             const events = key.replace('@','')
             if(!events || events === '' || value === '') return;
-            if( events === 'die' ) dom.ondie = value;
+            if( events === 'die' ) return dom.$ondie = value;
             dom.addEventListener(events,function(e){
                 e.stopPropagation();
                 try{
