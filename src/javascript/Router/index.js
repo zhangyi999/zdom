@@ -4,7 +4,7 @@ import Page from '../Commponent/Page'
 
 const routerList = {}
 
-const ontFindPageDom = (
+const ontFindPageDom = () => (
     Page({},
         dom.div({style: 'color: #fff;text-align: center;font-size: 100px;'},'404')
     )
@@ -13,6 +13,7 @@ const ontFindPageDom = (
 const config = {
     body: null,
     initUrl : null,
+    animation: null,
     stackPages: false, // 如果启用，则当您进行越来越深的导航时，导航链中的所有先前页面都不会从DOM中删除。例如，如果您有5个步骤（5页）中的某些表格，并且在最后5页上时，则需要访问第一页上的表格，这可能会很有用。
 }
 
@@ -49,7 +50,7 @@ function upDatePage( req, doms ) {
 }
 
 function getDomRouter( page, req ) {
-    const doms = routerList[page] 
+    const doms = routerList[page]
     return upDatePage( req, doms || ontFindPageDom )
 }
 
@@ -61,11 +62,11 @@ function getPage( ) {
 function addPage( stackPages ) {
     const Dom = getPage( )
     if ( stackPages === true ) {
-        config.body.appendChild( Dom )
+        addPageDom( Dom )
     } else {
         config.body.lastChild === null ?
-            config.body.appendChild( Dom ):
-            config.body.replaceChild( Dom, config.body.lastChild)
+            addPageDom( Dom ):
+            replacePageDom ( Dom )
     }
     return Dom
 }
@@ -107,9 +108,33 @@ function initPage( ) {
 }
 
 function removePage(  ) {
+    let d = 0
     config.body.lastChild.$ondie ? config.body.lastChild.$ondie() : ''
-    config.body.lastChild.remove()
+    config.animation !== null ? (
+        config.body.lastChild.className += ' '+ animationClass[config.animation].stop,
+        d = 300
+    ): ''
+    setTimeout(() => {
+        config.body.lastChild.remove()
+    }, d);
+    
 }
+
+
+const animationClass = [
+    { start: 'p_Router_start', stop: 'p_Router_die'}
+]
+function addPageDom( Dom ) {
+    config.animation !== null ? Dom.className += ' '+ animationClass[config.animation].start : '';
+    config.body.appendChild( Dom )
+}
+
+function replacePageDom ( Dom ) {
+    config.animation !== null ? Dom.className += ' '+ animationClass[config.animation].start : '';
+    config.body.replaceChild( Dom, config.body.lastChild)
+}
+
+// p_Router_start
 
 window.addEventListener( 'load',() => {
 
@@ -150,7 +175,7 @@ window.addEventListener( 'load',() => {
         if ( prevPages > pages ) {
             // 后退
             config.stackPages === true ? removePage(  ) : ''
-            if ( historyPagesUrl !== pagesUrl ) addPage( false )
+            if ( historyPagesUrl !== prevPages ) addPage( false )
         } else if ( prevPages < pages ) {
             // 前进
             addPage( config.stackPages )
@@ -169,9 +194,11 @@ const Router = Commponent(function( ...child ) {
     )
 })
 
-addPorto( Router, 'init', function ( el, stackPages = false )  {
+addPorto( Router, 'init', function ( el, { stackPages = false , animation = null } = {})  {
     config.body = el
     config.stackPages = stackPages
+    config.animation = animation
+    return this
 })
 
 addPorto( Router, 'addPage', function ({ url, dom }) {

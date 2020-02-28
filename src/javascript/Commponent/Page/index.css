@@ -8,22 +8,6 @@
     width: 100%;
     height: 100%;
     color: #dfe5ef;
-    opacity: 1;
-    animation: openPage .4s;
-    -webkit-animation: openPage .4s;
     background-color: #343639;
     z-index: 1;
-
-}
-
-@keyframes openPage
-{
-    0%   {opacity: 0;}
-    100% {opacity: 1;}
-}
- 
-@-webkit-keyframes open /* Safari 与 Chrome */
-{
-    0%   {opacity: 0;}
-    100% {opacity: 1;}
 }

@@ -1,1 +1,26 @@
-.p_Router{}
+.p_Router_start.p_Router_die {
+    opacity: 0;
+    transition: opacity .3s;
+    -moz-transition: opacity .3s;	/* Firefox 4 */
+    -webkit-transition: opacity .3s;	/* Safari 和 Chrome */
+    -o-transition: opacity .3s;	/* Opera */
+}
+
+.p_Router_start {
+    opacity: 1;
+    animation: openPage .3s;
+    -webkit-animation: openPage .3s;
+
+}
+
+@keyframes openPage
+{
+    0%   {opacity: 0;}
+    100% {opacity: 1;}
+}
+ 
+@-webkit-keyframes openPage /* Safari 与 Chrome */
+{
+    0%   {opacity: 0;}
+    100% {opacity: 1;}
+}
