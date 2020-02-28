@@ -26,11 +26,11 @@ function getReq( ) {
     }
 }
 
-function getData( _path ) {
+function getData( ) {
     const {
         data,
         url
-    } = getReq( _path )
+    } = getReq( )
     const req = {}
     data.split('&').map( v => {
         if ( v === undefined ) return
@@ -175,7 +175,7 @@ window.addEventListener( 'load',() => {
         if ( prevPages > pages ) {
             // 后退
             config.stackPages === true ? removePage(  ) : ''
-            if ( historyPagesUrl !== prevPages ) addPage( false )
+            if ( historyPagesUrl !== pagesUrl ) addPage( false )
         } else if ( prevPages < pages ) {
             // 前进
             addPage( config.stackPages )
@@ -205,6 +205,7 @@ addPorto( Router, 'addPage', function ({ url, dom }) {
     routerList[url] = dom
     return this
 })
+addPorto( Router, 'getUrl', getData )
 
 /**
  * 1. 前进
