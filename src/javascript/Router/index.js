@@ -136,8 +136,8 @@ function replacePageDom ( Dom ) {
 
 // p_Router_start
 
-window.addEventListener( 'load',() => {
-
+window.addEventListener( 'load', async () => {
+    if ( await config.load() === false ) return
     initPage( );
     document.querySelector('body').addEventListener( 'click', function( event ){
 
@@ -194,10 +194,13 @@ const Router = Commponent(function( ...child ) {
     )
 })
 
-addPorto( Router, 'init', function ( el, { stackPages = false , animation = null } = {})  {
+Router.config = config
+
+addPorto( Router, 'init', function ( el, { stackPages = false , animation = null, load = null } = {})  {
     config.body = el
     config.stackPages = stackPages
     config.animation = animation
+    config.load = load
     return this
 })
 
