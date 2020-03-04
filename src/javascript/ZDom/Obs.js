@@ -34,7 +34,7 @@ function isDiff( newData, oldObs ) {
     if ( checkTypes(newData) !== checkTypes(oldData) ) {
         // console.log ( newData, oldData, checkTypes(newData) , checkTypes(oldData) ,oldObs)
         Object.keys(oldObs).map (v => {
-            oldObs[v].remove()
+            // oldObs[v].remove()
             delete oldObs[v]
             // delete oldObs.data[v]
         })
