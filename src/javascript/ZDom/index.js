@@ -20,6 +20,7 @@ function Commponent(ZDomCommponFunction) {
         const props = {}
         addPorto(props, 'props', {})
         ObjectMap( attr, (v,key) => {
+
             if ( v instanceof Obs ) {
                 Object.defineProperty(props.props, key, {
                     enumerable: true, // 可枚举
@@ -28,7 +29,7 @@ function Commponent(ZDomCommponFunction) {
                         return attr[key].data
                     },
                     set(newVal) {
-                        attr[key].data = newVal
+                        attr[key].__set(newVal)
                     }
                 })
                 // addPorto(props, key, v, {writable:true, enumerable: true}) 
@@ -37,7 +38,7 @@ function Commponent(ZDomCommponFunction) {
         })
         const dom = ZDomCommponFunction.call(props, chlid);
         props.loaded?setTimeout(()=> props.loaded(),0):''; 
-        props.die?dom.ondie = props.die:'';
+        props.die?dom.$ondie = props.die:'';
         return dom
     }
 }
