@@ -167,3 +167,14 @@ function Index() {
 
 document.getElementById('app').appendChild(Index())
 ```
+
+## 迭代计划
+
+### 0.2.1
+
+- 使用 `dom.a('a tag') || dom.a({}, 'a tag')`。
+- 添加生命周期。
+- 优化 dom 替换方法。
+- 修改 增加 computer 方法。
+- 优化 $.data.array 方法。
+- 更依赖版本。
