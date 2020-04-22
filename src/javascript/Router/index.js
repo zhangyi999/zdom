@@ -137,7 +137,7 @@ function replacePageDom ( Dom ) {
 // p_Router_start
 
 window.addEventListener( 'load', async () => {
-    if ( await config.load() === false ) return
+    if ( config.load instanceof Function && await config.load() === false ) return
     initPage( );
     document.querySelector('body').addEventListener( 'click', function( event ){
 
