@@ -4,7 +4,7 @@
 
 这个项目代码写的很烂，仅只是作为个人练手用，简单实现了 组件和双向绑定，希望路过的大神们多喷一喷。
 
-### run
+### run -- s
 
 ```bash
 > git clone https://github.com/zhangyi999/zdom.git myApp
